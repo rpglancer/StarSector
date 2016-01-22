@@ -26,6 +26,7 @@ public class StarSector extends Canvas implements Runnable{
 	
 	private BufferedImage bufimg = new BufferedImage(WIDTH,HEIGHT,BufferedImage.TYPE_INT_RGB);
 	private Thread thread;
+	
 
 	public static void main(String[] args) {
 		StarSector SS = new StarSector();
@@ -51,10 +52,15 @@ public class StarSector extends Canvas implements Runnable{
 		double ns = 1000000000;
 		double delta = 0;
 		long timer = System.currentTimeMillis();
+		lastTime = System.nanoTime();
+		delta = 0;
+		timer = System.currentTimeMillis();
 		
 		while(running){
 			long now = System.nanoTime();
+			now = System.nanoTime();
 			delta += (now - lastTime) / ns;
+			lastTime = now;
 			if(delta >= 1){
 				//tick();
 				delta = 0;
