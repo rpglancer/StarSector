@@ -16,11 +16,15 @@ public class Mobile extends Entity{
 	private double SpeedCurrent;
 	private double SpeedMax;
 	
+	private int Heading;			// Contains heading as viewed from an x/y perspective 0-359
+	private int Mark;				// Contains the marked heading for traversal in an x/z perspective. 270-90
+	
 	private Vector<Coords> History;
 	
 	
 	@Override
 	public void deselect(){
+		this.isSelected = false;
 	}
 	
 	@Override
@@ -29,15 +33,19 @@ public class Mobile extends Entity{
 	}
 	
 	@Override
-	public void render(Graphics G){	
+	public void render(Graphics G){
+		switch(this.Class){
+		}
 	}
 	
 	@Override
 	public void select(){
+		this.isSelected = true;
 	}
 	
 	@Override
-	public void setLoc(double x, double y, double z){	
+	public void setLoc(double x, double y, double z){
+		this.loc.setCoords(x, y, z);
 	}
 	
 	@Override

@@ -7,6 +7,9 @@ import java.awt.image.BufferedImage;
 
 import javax.swing.JFrame;
 
+import ss.lib.Hud;
+import ss.lib.Tracon;
+
 
 public class StarSector extends Canvas implements Runnable{
 
@@ -16,14 +19,15 @@ public class StarSector extends Canvas implements Runnable{
 	private static final long serialVersionUID = 8384324761945636774L;
 	private boolean running = false;
 	
-	private static final int HEIGHT = 768;
-	private static final int WIDTH = 1024;
+	public static final int HEIGHT = 768;
+	public static final int WIDTH = 1024;
 	
 	private static final int VER_MAJOR = 0;
 	private static final int VER_MINOR = 0;
 	private static final int VER_REV = 1;
 	private static final String VER_REL = "a";
 	
+	private Hud hud;
 	private BufferedImage bufimg = new BufferedImage(WIDTH,HEIGHT,BufferedImage.TYPE_INT_RGB);
 	private Thread thread;
 	
@@ -62,6 +66,7 @@ public class StarSector extends Canvas implements Runnable{
 			delta += (now - lastTime) / ns;
 			lastTime = now;
 			if(delta >= 1){
+				hud.tick();
 				//tick();
 				delta = 0;
 			}
@@ -74,7 +79,7 @@ public class StarSector extends Canvas implements Runnable{
 	}
 	
 	private void init(){
-		
+		hud = new Hud();
 	}
 	
 	private void render(){
@@ -85,6 +90,8 @@ public class StarSector extends Canvas implements Runnable{
 		}
 		Graphics G = BS.getDrawGraphics();
 		G.drawImage(bufimg, 0, 0, getWidth(), getHeight(), this);
+		hud.render(G);
+		Tracon.render(G);
 		G.dispose();
 		BS.show();
 	}

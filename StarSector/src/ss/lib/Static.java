@@ -1,8 +1,22 @@
 package ss.lib;
 
 import java.awt.Graphics;
+import java.util.Vector;
+
+import ss.StarSector;
 
 public class Static extends Entity {
+	private String Type;
+	private String Name;
+	
+	private Coords Arrival;
+	private Coords Departure;
+	
+	private Vector<Mobile> Queue;
+	
+	public Static(){
+		
+	}
 
 	@Override
 	public void deselect() {
@@ -36,8 +50,11 @@ public class Static extends Entity {
 
 	@Override
 	public void tick() {
+		if(Queue.size() > 0){
+			ss.lib.Tracon.addMobile(Queue.elementAt(0));
+			Queue.removeElementAt(0);
+		}
 		// TODO Auto-generated method stub
-		
 	}
 
 }
