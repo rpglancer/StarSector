@@ -1,4 +1,4 @@
-package util;
+package ss.util;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;

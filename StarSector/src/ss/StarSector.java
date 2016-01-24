@@ -4,11 +4,15 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 
 import javax.swing.JFrame;
 
 import ss.lib.Hud;
+import ss.lib.SpriteSheet;
+import ss.lib.Static;
 import ss.lib.Tracon;
+import ss.util.BufferedImageLoader;
 
 
 public class StarSector extends Canvas implements Runnable{
@@ -19,8 +23,26 @@ public class StarSector extends Canvas implements Runnable{
 	private static final long serialVersionUID = 8384324761945636774L;
 	private boolean running = false;
 	
-	public static final int HEIGHT = 768;
-	public static final int WIDTH = 1024;
+	public static final int SPRITEHEIGHT = 16;
+	public static final int SPRITEWIDTH = 16;
+	
+	public static final int HEIGHT = 480;
+	public static final int WIDTH = 720;
+	
+	public static final int SECTORSIZE_X = 150;
+	public static final int SECTORSIZE_Y = 100;
+	public static final int SECTORSIZE_Z = 100;
+	
+	public static final int SweepSize = 10;
+	public static final int SweepLength = 60 / SweepSize;
+	
+	public static final double PPKM_X = WIDTH / SECTORSIZE_X;
+	public static final double PPKM_Y = HEIGHT / SECTORSIZE_Y;
+	public static final double PPKM_Z = HEIGHT / SECTORSIZE_Z;
+	public static final double PPKM_SQ = (HEIGHT * WIDTH) / (SECTORSIZE_X * SECTORSIZE_Y);
+	
+	
+	public static SpriteSheet Sprites;
 	
 	private static final int VER_MAJOR = 0;
 	private static final int VER_MINOR = 0;
@@ -53,7 +75,8 @@ public class StarSector extends Canvas implements Runnable{
 	public void run(){
 		init();
 		long lastTime = System.nanoTime();
-		double ns = 1000000000;
+		final double AmountOfTicks = 1.0/SweepLength;
+		double ns = 1000000000 / AmountOfTicks;
 		double delta = 0;
 		long timer = System.currentTimeMillis();
 		lastTime = System.nanoTime();
@@ -67,7 +90,7 @@ public class StarSector extends Canvas implements Runnable{
 			lastTime = now;
 			if(delta >= 1){
 				hud.tick();
-				//tick();
+				System.out.println("Tick");
 				delta = 0;
 			}
 			if(System.currentTimeMillis() - timer > 1000){
@@ -80,6 +103,15 @@ public class StarSector extends Canvas implements Runnable{
 	
 	private void init(){
 		hud = new Hud();
+		BufferedImageLoader BIL = new BufferedImageLoader();
+		try{
+			BufferedImage Temp = BIL.loadImage("../../data/sprites.png");
+			Sprites = new SpriteSheet(Temp);
+		} catch(IOException e){
+			e.printStackTrace();
+		}
+		Static Test = new Static("Station");
+		
 	}
 	
 	private void render(){

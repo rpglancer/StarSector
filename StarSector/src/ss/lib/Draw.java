@@ -5,6 +5,7 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
 
 import ss.StarSector;
 
@@ -37,6 +38,14 @@ public class Draw {
 		Draw.box(G, Rect, 2, Color.GREEN, Color.BLACK);
 		G2D.setFont(PrevF);
 		G2D.setColor(PrevC);
+	}
+	
+	public static void sprite(Graphics G, BufferedImage BI, double X, double Y){
+		G.drawImage(BI, (int)X, (int)Y, null);
+	}
+	
+	public static void sprite_centered(Graphics G, BufferedImage BI, double X, double Y){
+		G.drawImage(BI, (int)(X - BI.getWidth() / 2), (int)(Y - BI.getHeight() / 2), null);
 	}
 	
 }

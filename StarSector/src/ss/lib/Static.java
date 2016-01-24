@@ -14,26 +14,29 @@ public class Static extends Entity {
 	
 	private Vector<Mobile> Queue;
 	
-	public Static(){
-		
+	public Static(String Type){
+		this.Type = Type;
+		this.Name = "TestStation";
+		this.loc = new Coords(StarSector.WIDTH / 2, StarSector.HEIGHT / 2, 0);
+		this.Queue = new Vector<Mobile>();
+		this.SpriteCol = 1;
+		this.SpriteRow = 1;
+		Tracon.addStatic(this);
 	}
 
 	@Override
 	public void deselect() {
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public Coords getLoc() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.loc;
 	}
 
 	@Override
 	public void select() {
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
@@ -44,8 +47,8 @@ public class Static extends Entity {
 
 	@Override
 	public void render(Graphics G) {
+		Draw.sprite_centered(G, StarSector.Sprites.grabImage(SpriteCol, SpriteRow, 16, 16), this.loc.getX(), this.loc.getY());
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
