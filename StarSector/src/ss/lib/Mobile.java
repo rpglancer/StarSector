@@ -3,36 +3,38 @@ package ss.lib;
 import java.awt.Graphics;
 import java.util.Vector;
 
+import ss.type.MTYPE;
+
 public class Mobile extends Entity{
 	
-	private String Name;
-	private String Type;
-	private String Owner;
-	private Static Destination;
-	private Static Origin;
+	private String name;
+	private MTYPE type;
+	private String owner;
+	private Static destination		= null;
+	private Static origin			= null;
+	private Static waypoint			= null;
 	
-	private double AccelCurrent;
-	private double AccelMin;
-	private double AccelMax;
-	private double SpeedCurrent;
-	private double SpeedMax;
+	private double accelCurrent		= 0;
+	private double accelMin			= 0;
+	private double accelMax			= 0;
+	private double speedCurrent		= 0;
+	private double speedMax			= 0;
 	
-	private int HeadingCurrent;			// Contains heading as viewed from an x/y perspective 0-359
-	private int HeadingDesired;
-	private int MarkCurrent;			// Contains the marked heading for traversal in an x/z perspective. 270-90
-	private int MarkDesired;
+	private int hdgCurrent			= 0;			// Contains heading as viewed from an x/y perspective 0-359
+	private int hdgDesired			= 0;
+	private int mkCurrent			= 0;			// Contains the marked heading for traversal in an x/z perspective. 270-90
+	private int mkDesired			= 0;
 	
-	private Vector<Coords> History;
+	private Vector<Coords> history;
 	
 	public Mobile(){
 		
 	}
 	
-	public Mobile(String Type, Static Origin, Static Destination){
-		this.Type = Type;
-		this.Origin = Origin;
-		this.Destination = Destination;
-		setType();
+	public Mobile(MTYPE type, Static origin, Static destination){
+		this.type = type;
+		this.origin = origin;
+		this.destination = destination;
 	}
 	
 	
@@ -47,52 +49,21 @@ public class Mobile extends Entity{
 	}
 	
 	@Override
-	public void render(Graphics G){
+	public void render(Graphics G, boolean p){
 	}
 	
 	@Override
 	public void select(){
-		this.isSelected = true;
+		if(canSelect) isSelected = true;
 	}
 	
 	@Override
 	public void setLoc(double x, double y, double z){
-		this.loc.setCoords(x, y, z);
+		this.loc.SetCoords(x, y, z);
 	}
 	
 	@Override
 	public void tick(){
-	}
-	
-	private void setType(){
-		switch(this.Type){
-		case "M0":
-			break;
-		case "M1":
-			break;
-		case "M2":
-			break;
-		case "M3":
-			break;
-		case "M4":
-			break;
-		case "M5":
-			break;
-		case "M6":
-			break;
-		case "M7":
-			break;
-		case "TS":
-			break;
-		case "TM":
-			break;
-		case "TL":
-			break;
-		case "TP":
-			break;
-		default:
-			break;	
-		}
 	}
 	
 }

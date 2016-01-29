@@ -1,6 +1,7 @@
 package ss.lib;
 
 import java.awt.Graphics;
+import java.awt.event.MouseEvent;
 import java.util.LinkedList;
 
 import ss.StarSector;
@@ -37,14 +38,14 @@ public class Tracon {
 		Statics.push(s);
 	}
 	
-	public static void selectEntityAt(Coords c){
+	public static Entity selectEntityAt(MouseEvent arg0){
 		for(int i = 0; i < Statics.size(); i++){
 			Entity Temp = Statics.get(i);
-			if(Temp.loc.getX() - (StarSector.SPRITEWIDTH / 2) <= c.getX() && Temp.loc.getX() + (StarSector.SPRITEWIDTH / 2) >= c.getX() &&
-				Temp.loc.getY() - (StarSector.SPRITEHEIGHT / 2) <= c.getY() && Temp.loc.getY() + (StarSector.SPRITEHEIGHT / 2) >= c.getY()){
+			if(Temp.loc.GetX() - (StarSector.SPRITEWIDTH / 2) <= arg0.getX() && Temp.loc.GetX() + (StarSector.SPRITEWIDTH / 2) >= arg0.getX() &&
+				Temp.loc.GetY() - (StarSector.SPRITEHEIGHT / 2) <= arg0.getY() && Temp.loc.GetY() + (StarSector.SPRITEHEIGHT / 2) >= arg0.getY()){
 				if(Temp.canSelect){
 					Temp.select();
-					return;
+					return Temp;
 				}
 			}
 			else{
@@ -53,25 +54,26 @@ public class Tracon {
 		}
 		for(int i = 0; i < Mobiles.size(); i++){
 			Entity Temp = Mobiles.get(i);
-			if(Temp.loc.getX() - (StarSector.SPRITEWIDTH / 2) <= c.getX() && Temp.loc.getX() + (StarSector.SPRITEWIDTH / 2) >= c.getX() &&
-					Temp.loc.getY() - (StarSector.SPRITEHEIGHT / 2) <= c.getY() && Temp.loc.getY() + (StarSector.SPRITEHEIGHT / 2) >= c.getY()){
+			if(Temp.loc.GetX() - (StarSector.SPRITEWIDTH / 2) <= arg0.getX() && Temp.loc.GetX() + (StarSector.SPRITEWIDTH / 2) >= arg0.getX() &&
+					Temp.loc.GetY() - (StarSector.SPRITEHEIGHT / 2) <= arg0.getY() && Temp.loc.GetY() + (StarSector.SPRITEHEIGHT / 2) >= arg0.getY()){
 				if(Temp.canSelect){
 					Temp.select();
-					return;
+					return Temp;
 				}
 			}
 			else{
-				Mobiles.get(i).deselect();
+				Temp.deselect();
 			}
 		}
+		return null;
 	}
 	
-	public static void render(Graphics G){
+	public static void Render(Graphics G, boolean p){
 		for(int i = 0; i < Statics.size(); i++){
-			Statics.get(i).render(G);
+			Statics.get(i).render(G,p);
 		}
 		for(int i = 0; i < Mobiles.size(); i++){
-			Mobiles.get(i).render(G);
+			Mobiles.get(i).render(G,p);
 		}
 	}
 	

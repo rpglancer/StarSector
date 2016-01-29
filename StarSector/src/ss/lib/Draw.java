@@ -29,16 +29,6 @@ public class Draw {
 		}
 		G2D.setColor(PrevC);
 	}
-
-	public static void hud(Graphics G){
-		Graphics2D G2D = (Graphics2D) G;
-		Font PrevF = G2D.getFont();
-		Color PrevC = G2D.getColor();
-		Rectangle Rect = new Rectangle(0,0,StarSector.WIDTH,StarSector.HEIGHT);
-		Draw.box(G, Rect, 2, Color.GREEN, Color.BLACK);
-		G2D.setFont(PrevF);
-		G2D.setColor(PrevC);
-	}
 	
 	public static void sprite(Graphics G, BufferedImage BI, double X, double Y){
 		G.drawImage(BI, (int)X, (int)Y, null);

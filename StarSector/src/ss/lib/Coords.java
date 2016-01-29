@@ -11,38 +11,38 @@ public class Coords {
 		this.z = z;
 	}
 	
-	public double getX(){
+	public double GetX(){
 		return x;
 	}
 	
-	public double getY(){
+	public double GetY(){
 		return y;
 	}
 	
-	public double getZ(){
+	public double GetZ(){
 		return z;
 	}
 	
-	public double[] getCoords(){
+	public double[] GetCoords(){
 		double temp[] = {x,y,z};
 		return temp;
 	}
 	
-	public void setCoords(double x, double y, double z){
+	public void SetCoords(double x, double y, double z){
 		this.x = x;
 		this.y = y;
 		this.z = z;
 	}
 	
-	public void setX(double x){
+	public void SetX(double x){
 		this.x = x;
 	}
 	
-	public void setY(double y){
+	public void SetY(double y){
 		this.y = y;
 	}
 	
-	public void setZ(double z){
+	public void SetZ(double z){
 		this.z = z;
 	}
 }

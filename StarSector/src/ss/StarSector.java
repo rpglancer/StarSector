@@ -11,7 +11,7 @@ import javax.swing.JFrame;
 import ss.lib.Hud;
 import ss.lib.SpriteSheet;
 import ss.lib.Static;
-import ss.lib.Tracon;
+import ss.type.STYPE;
 import ss.util.BufferedImageLoader;
 
 
@@ -103,6 +103,8 @@ public class StarSector extends Canvas implements Runnable{
 	
 	private void init(){
 		hud = new Hud();
+		this.addMouseListener(hud);
+		this.addMouseMotionListener(hud);
 		BufferedImageLoader BIL = new BufferedImageLoader();
 		try{
 			BufferedImage Temp = BIL.loadImage("../../data/sprites.png");
@@ -110,22 +112,21 @@ public class StarSector extends Canvas implements Runnable{
 		} catch(IOException e){
 			e.printStackTrace();
 		}
-		Static Test = new Static("Station");
-		
+		Static Test = new Static(STYPE.STATION);	
 	}
 	
 	private void render(){
-		BufferStrategy BS = this.getBufferStrategy();
-		if(BS == null){
+		BufferStrategy bs = this.getBufferStrategy();
+		if(bs == null){
 			createBufferStrategy(3);
 			return;
 		}
-		Graphics G = BS.getDrawGraphics();
-		G.drawImage(bufimg, 0, 0, getWidth(), getHeight(), this);
-		hud.render(G);
-		Tracon.render(G);
-		G.dispose();
-		BS.show();
+		Graphics g = bs.getDrawGraphics();
+		g.drawImage(bufimg, 0, 0, getWidth(), getHeight(), this);
+		hud.Render(g);
+//		Tracon.Render(g);
+		g.dispose();
+		bs.show();
 	}
 	
 	private synchronized void start(){

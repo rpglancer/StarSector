@@ -4,9 +4,10 @@ import java.awt.Graphics;
 import java.util.Vector;
 
 import ss.StarSector;
+import ss.type.STYPE;
 
 public class Static extends Entity {
-	private String Type;
+	private STYPE type;
 	private String Name;
 	
 	private Coords Arrival;
@@ -14,13 +15,12 @@ public class Static extends Entity {
 	
 	private Vector<Mobile> Queue;
 	
-	public Static(String Type){
-		this.Type = Type;
+	public Static(STYPE type){
+		this.type = type;
 		this.Name = "TestStation";
 		this.loc = new Coords(StarSector.WIDTH / 2, StarSector.HEIGHT / 2, 0);
 		this.Queue = new Vector<Mobile>();
-		this.SpriteCol = 1;
-		this.SpriteRow = 1;
+		this.canSelect = true;
 		Tracon.addStatic(this);
 	}
 
@@ -44,11 +44,11 @@ public class Static extends Entity {
 		// TODO Auto-generated method stub
 		
 	}
-
+	
 	@Override
-	public void render(Graphics G) {
-		Draw.sprite_centered(G, StarSector.Sprites.grabImage(SpriteCol, SpriteRow, 16, 16), this.loc.getX(), this.loc.getY());
-		// TODO Auto-generated method stub
+	public void render(Graphics g, boolean p){
+		if(p) Draw.sprite_centered(g, StarSector.Sprites.grabImage(type.getSpriteC(), type.getSpriteR(), 16, 16), this.loc.GetX(), this.loc.GetY());
+		else Draw.sprite_centered(g, StarSector.Sprites.grabImage(type.getSpriteC(), type.getSpriteR(), 16, 16), this.loc.GetX(), this.loc.GetZ());
 	}
 
 	@Override
