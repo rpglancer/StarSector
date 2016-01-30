@@ -3,77 +3,71 @@ package ss.lib;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Vector;
 
 import ss.StarSector;
 import ss.type.ALIGNH;
 import ss.type.ALIGNV;
+import ss.type.ELEMENT;
 import ss.type.HUDMODE;
 import ss.type.RESPONSE;
 
+/**
+ * The Hud class manages all the input for the game as well as<br>
+ * rendering the game {@link Entity} as pulled from {@link Tracon}.
+ * @author Matt Bangert
+ *
+ */
 public class Hud implements MouseMotionListener, MouseListener {
 	
 	private Entity selectedEntity;
-	private final int hudButtonWidth = 32;
-	private final int hudButtonHeight = 16;
-	
-	private final int keypadWidth = 128;
-	private final int keypadHeight = 160;
-	private final int keypadButtonSize = 32;
-	private final int keypadSpacing = 8;
 	
 	private boolean hudPerspective = true;				// true = x/y, false = x/z
 	private HUDMODE hudMode = HUDMODE.OVERVIEW;
 	
-	private Vector<HudElement> hudElements = new Vector<HudElement>();
-	private Vector<HudElement> keypadElements = new Vector<HudElement>();
+	private SimpleDateFormat dateF = new SimpleDateFormat("HH:mm:ss zzz");
 	
-	HudElement xySwap = new HudElement(this, new Rectangle(StarSector.WIDTH - hudButtonWidth, 0, hudButtonWidth, hudButtonHeight), HUDMODE.OVERVIEW, RESPONSE.XY);
-	HudElement utcTime = new HudElement(this, new Rectangle(0,0,80,16),HUDMODE.OVERVIEW, RESPONSE.NULL);
-	
-	HudElement kpOutline = new HudElement(this, new Rectangle(StarSector.WIDTH / 2 - keypadWidth / 2, StarSector.HEIGHT / 2 - keypadHeight / 2, keypadWidth, keypadHeight), HUDMODE.INPUT, RESPONSE.NULL);
-	HudElement kpOne = new HudElement(this, new Rectangle(kpOutline.getX() + keypadSpacing, kpOutline.getY() + keypadSpacing, keypadButtonSize, keypadButtonSize), HUDMODE.INPUT, RESPONSE.ONE);
-	HudElement kpTwo = new HudElement(this, new Rectangle(kpOne.getX() + kpOne.getWidth() + keypadSpacing, kpOutline.getY() + keypadSpacing, keypadButtonSize, keypadButtonSize), HUDMODE.INPUT, RESPONSE.TWO);
-	HudElement kpThree = new HudElement(this, new Rectangle(kpTwo.getX() + kpTwo.getWidth() + keypadSpacing, kpOutline.getY() + keypadSpacing, keypadButtonSize, keypadButtonSize), HUDMODE.INPUT, RESPONSE.THREE);
-	
+	private Vector<HudElement> ovwElements = new Vector<HudElement>();
+	private Vector<HudElement> inputElements = new Vector<HudElement>();
+	private Vector<HudElement> opsElements = new Vector<HudElement>();
 	
 	public Hud(){
-		hudElements.addElement(utcTime);
-		hudElements.addElement(xySwap);
-		
-		hudElements.addElement(kpOutline);
-		hudElements.addElement(kpOne);
-		hudElements.addElement(kpTwo);
-		hudElements.addElement(kpThree);
-	}
-	
-	// Not needed given the static nature of Tracon
-	public void AddMobile(Mobile m){
-		Tracon.addMobile(m);
-	}
-	
-	// Not needed given the static nature of Tracon
-	public void AddStatic(Static s){
-		Tracon.addStatic(s);
+		for(ELEMENT e : ELEMENT.values()){
+			HudElement temp = new HudElement(this, e);
+			switch(e.getMode()){
+			case INPUT:
+				inputElements.addElement(temp);
+				break;
+			case OPS:
+				opsElements.addElement(temp);
+				break;
+			case OVERVIEW:
+				ovwElements.addElement(temp);
+				break;
+			default:
+				break;
+			}
+		}
 	}
 	
 	public void tick(){
 		Tracon.tick();
 	}
 	
-	// Render Base UI
 	// Render Tracon Objects
+	// Render Base UI
 	// Render Contextual UI (if applicable)
-	
 	public void Render(Graphics G){
 		Tracon.Render(G, hudPerspective);
 		renderBaseHud(G);
 		if(hudMode == HUDMODE.OPS)renderOps(G);
 		if(hudMode == HUDMODE.INPUT)renderInput(G);
+		renderInput(G);
 	}
 
 	@Override
@@ -104,9 +98,9 @@ public class Hud implements MouseMotionListener, MouseListener {
 				break;
 			case OVERVIEW:
 				if(arg0.getY() <= 16){
-					for(int i = 0; i < hudElements.size(); i++){
-						if(hudElements.get(i).wasClicked(arg0.getX(), arg0.getY())){
-							hudProcess(hudElements.get(i));
+					for(int i = 0; i < ovwElements.size(); i++){
+						if(ovwElements.get(i).wasClicked(arg0.getX(), arg0.getY())){
+							hudProcess(ovwElements.get(i));
 							break;
 						}
 					}
@@ -141,9 +135,9 @@ public class Hud implements MouseMotionListener, MouseListener {
 		switch(element.getElementResponse()){
 		case APRCLR:
 			break;
-		case CANCEL:
+		case CNCL:
 			break;
-		case CONFIRM:
+		case XMIT:
 			break;
 		case DCT:
 			break;
@@ -162,6 +156,7 @@ public class Hud implements MouseMotionListener, MouseListener {
 		case NINE:
 			break;
 		case NULL:
+			System.out.println("WARN: NULL PROCESSED");
 			break;
 		case ONE:
 			break;
@@ -190,6 +185,7 @@ public class Hud implements MouseMotionListener, MouseListener {
 	}
 	
 	private void renderBaseHud(Graphics G){
+		Date td = new Date();
 		Graphics2D G2D = (Graphics2D)G;
 		Color PrevC = G2D.getColor();
 		G2D.setColor(Color.DARK_GRAY);
@@ -198,19 +194,31 @@ public class Hud implements MouseMotionListener, MouseListener {
 		G2D.fillRect(0, 0, StarSector.WIDTH, 16);
 		G2D.setColor(Color.DARK_GRAY);
 		G2D.drawRect(0, 0, StarSector.WIDTH, 16);
-		for(int i = 0; i < hudElements.size(); i++){
-			G2D.draw(hudElements.get(i).getElementArea());
-			Text.BoxText(G, Fonts.RadarText, hudElements.get(i).getElementArea(), ALIGNH.CENTER, ALIGNV.MIDDLE, hudElements.get(i).getElementResponse().getText());
-		}
+		for(int i = 0; i < ovwElements.size(); i++){
+			G2D.setColor(ovwElements.get(i).getColor());
+			G2D.draw(ovwElements.get(i).getElementArea());
+			G2D.setColor(ovwElements.get(i).getElementResponse().getColorPri());
+			Text.BoxText(G, Fonts.RadarText, ovwElements.get(i).getElementArea(), ALIGNH.CENTER, ALIGNV.MIDDLE, ovwElements.get(i).getElementResponse().getText());
+			if(ovwElements.get(i).getElementResponse() == RESPONSE.CLOCK)
+				Text.BoxText(G, Fonts.RadarText, ovwElements.get(i).getElementArea(), ALIGNH.CENTER, ALIGNV.MIDDLE, dateF.format(td));
+			}
 		G2D.setColor(PrevC);
 	}
 	
 	private void renderOps(Graphics G){
-		
 	}
 	
 	private void renderInput(Graphics G){
-		
+		Graphics2D G2D = (Graphics2D)G;
+		Color PrevC = G2D.getColor();
+		for(int i = 0; i < inputElements.size(); i++){
+			G2D.setColor(inputElements.get(i).getColorP());
+			G2D.fill(inputElements.get(i).getElementArea());
+			G2D.setColor(inputElements.get(i).getColorS());
+			G2D.draw(inputElements.get(i).getElementArea());
+			G2D.setColor(inputElements.get(i).getElementResponse().getColorPri());
+			Text.BoxText(G, Fonts.RadarText, inputElements.get(i).getElementArea(), ALIGNH.CENTER, ALIGNV.MIDDLE, inputElements.get(i).getElementResponse().getText());
+		}
+		G2D.setColor(PrevC);
 	}
-	
 }

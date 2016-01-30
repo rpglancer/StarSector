@@ -90,7 +90,7 @@ public class StarSector extends Canvas implements Runnable{
 			lastTime = now;
 			if(delta >= 1){
 				hud.tick();
-				System.out.println("Tick");
+//				System.out.println("Tick");
 				delta = 0;
 			}
 			if(System.currentTimeMillis() - timer > 1000){

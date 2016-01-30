@@ -6,6 +6,12 @@ import java.util.LinkedList;
 
 import ss.StarSector;
 
+/**
+ * The underlying manager for the sector of space under the control of the player. Tracon keeps<br>
+ * the lists of all active Mobile and Static entities and culls those which are no longer relevant.
+ * @author Matt Bangert
+ *
+ */
 public class Tracon {
 
 	private static LinkedList<Entity> Mobiles = new LinkedList<Entity>();
@@ -68,6 +74,11 @@ public class Tracon {
 		return null;
 	}
 	
+	/**
+	 * Draws all Entity currently being managed by Tracon to the screen.
+	 * @param G	Graphics to which the entities are rendered.
+	 * @param p Perspective in which the entities are rendered.
+	 */
 	public static void Render(Graphics G, boolean p){
 		for(int i = 0; i < Statics.size(); i++){
 			Statics.get(i).render(G,p);
@@ -77,6 +88,9 @@ public class Tracon {
 		}
 	}
 	
+	/**
+	 * Causes all Entity currently being managed by Tracon to update.
+	 */
 	public static void tick(){
 		for(int i = 0; i < Statics.size(); i++){
 			Statics.get(i).tick();
