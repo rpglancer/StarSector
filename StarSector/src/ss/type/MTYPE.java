@@ -1,18 +1,19 @@
 package ss.type;
 
+//	ID	Txt	 sRow sCol
 public enum MTYPE {
-	M0 ("M0", 0, 0),
-	M1 ("M0", 0, 0),
-	M2 ("M0", 0, 0),
-	M3 ("M0", 0, 0),
-	M4 ("M0", 0, 0),
-	M5 ("M0", 0, 0),
-	M6 ("M0", 0, 0),
-	M7 ("M0", 0, 0),
-	TS ("M0", 0, 0),
-	TM ("M0", 0, 0),
-	TL ("M0", 0, 0),
-	TP ("M0", 0, 0);
+	M0 ("M0", 1, 1),
+	M1 ("M1", 1, 2),
+	M2 ("M2", 1, 1),
+	M3 ("M3", 1, 1),
+	M4 ("M4", 1, 1),
+	M5 ("M5", 1, 1),
+	M6 ("M6", 1, 1),
+	M7 ("M7", 1, 1),
+	TS ("TS", 1, 1),
+	TM ("TM", 1, 1),
+	TL ("TL", 1, 1),
+	TP ("TP", 1, 1);
 	
 	private String type;
 	private int spriteR;
@@ -24,15 +25,15 @@ public enum MTYPE {
 		this.spriteC = spriteC;
 	}
 	
-	int getSpriteR(){
+	public int getSpriteR(){
 		return this.spriteR;
 	}
 	
-	int getSpriteC(){
+	public int getSpriteC(){
 		return this.spriteC;
 	}
 	
-	String getType(){
+	public String getType(){
 		return this.type;
 	}
 	

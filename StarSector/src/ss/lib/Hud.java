@@ -27,7 +27,8 @@ public class Hud implements MouseMotionListener, MouseListener {
 	
 	private Entity selectedEntity;
 	
-	private boolean hudPerspective = true;				// true = x/y, false = x/z
+	private static boolean hudPerspective = true;				// true = x/y, false = x/z
+	private static int hudTimeProjection = 5;					// The number of minutes calculated for course projection.
 	private HUDMODE hudMode = HUDMODE.OVERVIEW;
 	
 	private SimpleDateFormat dateF = new SimpleDateFormat("HH:mm:ss zzz");
@@ -59,6 +60,10 @@ public class Hud implements MouseMotionListener, MouseListener {
 		Tracon.tick();
 	}
 	
+	public static boolean getP(){
+		return hudPerspective;
+	}
+	
 	// Render Tracon Objects
 	// Render Base UI
 	// Render Contextual UI (if applicable)
@@ -67,7 +72,6 @@ public class Hud implements MouseMotionListener, MouseListener {
 		renderBaseHud(G);
 		if(hudMode == HUDMODE.OPS)renderOps(G);
 		if(hudMode == HUDMODE.INPUT)renderInput(G);
-		renderInput(G);
 	}
 
 	@Override
@@ -220,5 +224,9 @@ public class Hud implements MouseMotionListener, MouseListener {
 			Text.BoxText(G, Fonts.RadarText, inputElements.get(i).getElementArea(), ALIGNH.CENTER, ALIGNV.MIDDLE, inputElements.get(i).getElementResponse().getText());
 		}
 		G2D.setColor(PrevC);
+	}
+
+	public static int getTimeProject(){
+		return hudTimeProjection;
 	}
 }

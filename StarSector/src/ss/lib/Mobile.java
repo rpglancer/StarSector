@@ -1,8 +1,10 @@
 package ss.lib;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.util.Vector;
 
+import ss.StarSector;
 import ss.type.MTYPE;
 
 public class Mobile extends Entity{
@@ -25,7 +27,9 @@ public class Mobile extends Entity{
 	private int mkCurrent			= 0;			// Contains the marked heading for traversal in an x/z perspective. 270-90
 	private int mkDesired			= 0;
 	
-	private Vector<Coords> history;
+	private Coords dir;
+	
+	private Vector<Coords> history = new Vector<Coords>();
 	
 	public Mobile(){
 		
@@ -33,10 +37,21 @@ public class Mobile extends Entity{
 	
 	public Mobile(MTYPE type, Static origin, Static destination){
 		this.type = type;
+		this.name = "ShiggyDoo";
 		this.origin = origin;
 		this.destination = destination;
+		this.loc = new Coords(origin.getLoc().GetX(), origin.getLoc().GetY(), origin.getLoc().GetZ());
+		hdgCurrent = 45;
+		hdgDesired = hdgCurrent;
+		mkCurrent = 90;
+		mkDesired = mkCurrent;
+		accelCurrent = 5;
+		accelMax = accelCurrent;
+		speedCurrent = 150;
+		speedMax = 150;
+		this.dir = Calc.dVector(this, Hud.getTimeProject());
+		Tracon.addMobile(this);
 	}
-	
 	
 	@Override
 	public void deselect(){
@@ -48,8 +63,25 @@ public class Mobile extends Entity{
 		return this.loc;
 	}
 	
+	public double getSpd(){
+		return this.speedCurrent;
+	}
+	
+	public double getHdg(){
+		return (double)hdgCurrent;
+	}
+	
+	public double getMK(){
+		return (double)mkCurrent;
+	}
+	
 	@Override
-	public void render(Graphics G, boolean p){
+	public void render(Graphics g, boolean p){
+		if(p) Draw.sprite_centered(g, StarSector.Sprites.grabImage(type.getSpriteC(), type.getSpriteR(), 16, 16), this.loc.GetX(), this.loc.GetY());
+		else Draw.sprite_centered(g, StarSector.Sprites.grabImage(type.getSpriteC(), type.getSpriteR(), 16, 16), this.loc.GetX(), this.loc.GetZ());
+		Draw.square_centered(g, this.loc, (int)(2 * StarSector.PPKM), Color.cyan, Hud.getP());
+		if(isSelected)Draw.history(g, history);
+		Draw.line(g, loc, dir, Color.green, p);
 	}
 	
 	@Override
@@ -64,6 +96,15 @@ public class Mobile extends Entity{
 	
 	@Override
 	public void tick(){
+		updateHistory();
+		loc.add(Calc.mVector(this));
+		dir = Calc.dVector(this, Hud.getTimeProject());
+	}
+	
+	private void updateHistory(){
+		Coords temp = new Coords(loc.GetX(), loc.GetY(), loc.GetZ());
+		history.add(0, temp);
+		if(history.size() == 20)history.remove(19);
 	}
 	
 }

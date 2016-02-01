@@ -3,11 +3,11 @@ package ss.type;
 import java.awt.Color;
 
 import ss.StarSector;
-
+//														Fill			Border
+//	EnumID				HUDMODE			RESPONSE		ColorAvail		ColorNotAvail	Coordinates
 public enum ELEMENT {
-	
-	HUD_OVW_XYSWP	(HUDMODE.OVERVIEW, RESPONSE.XY, 	Color.darkGray, Color.cyan,		StarSector.WIDTH - 32, 0, 32, 16),
-	HUD_OVW_CLOCK 	(HUDMODE.OVERVIEW, RESPONSE.CLOCK,	Color.darkGray, Color.cyan,		0, 0, 80, 16),
+	HUD_OVW_XYSWP	(HUDMODE.OVERVIEW, RESPONSE.XY, 	Color.darkGray, Color.darkGray,		StarSector.WIDTH - 32, 0, 32, 16),
+	HUD_OVW_CLOCK 	(HUDMODE.OVERVIEW, RESPONSE.CLOCK,	Color.darkGray, Color.darkGray,		0, 0, 80, 16),
 	HUD_OPS 		(HUDMODE.OPS, RESPONSE.NULL,		Color.black, Color.darkGray,	0, 0, 128, 128),
 	HUD_OPS_XMIT 	(HUDMODE.OPS, RESPONSE.XMIT,		Color.darkGray, Color.green,	0, 0, 128, 128),
 	HUD_OPS_DISR 	(HUDMODE.OPS, RESPONSE.DISR,		Color.darkGray, Color.green,	0, 0, 128, 128),

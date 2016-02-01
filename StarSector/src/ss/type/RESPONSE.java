@@ -2,6 +2,7 @@ package ss.type;
 
 import java.awt.Color;
 
+//	EnumID	Text	ColorAvail	 ColorNotAvail
 public enum RESPONSE {
 	NULL	("\0",	Color.black, Color.black),
 	ZER		("0",	Color.green, Color.darkGray),

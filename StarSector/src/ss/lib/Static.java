@@ -18,7 +18,7 @@ public class Static extends Entity {
 	public Static(STYPE type){
 		this.type = type;
 		this.Name = "TestStation";
-		this.loc = new Coords(StarSector.WIDTH / 2, StarSector.HEIGHT / 2, 0);
+		this.loc = new Coords(StarSector.WIDTH / 2, StarSector.HEIGHT / 2, 120);
 		this.Queue = new Vector<Mobile>();
 		this.canSelect = true;
 		Tracon.addStatic(this);

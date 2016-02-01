@@ -9,8 +9,10 @@ import java.io.IOException;
 import javax.swing.JFrame;
 
 import ss.lib.Hud;
+import ss.lib.Mobile;
 import ss.lib.SpriteSheet;
 import ss.lib.Static;
+import ss.type.MTYPE;
 import ss.type.STYPE;
 import ss.util.BufferedImageLoader;
 
@@ -36,18 +38,19 @@ public class StarSector extends Canvas implements Runnable{
 	public static final int SweepSize = 10;
 	public static final int SweepLength = 60 / SweepSize;
 	
-	public static final double PPKM_X = WIDTH / SECTORSIZE_X;
-	public static final double PPKM_Y = HEIGHT / SECTORSIZE_Y;
-	public static final double PPKM_Z = HEIGHT / SECTORSIZE_Z;
-	public static final double PPKM_SQ = (HEIGHT * WIDTH) / (SECTORSIZE_X * SECTORSIZE_Y);
+	public static final double PPKM = WIDTH / SECTORSIZE_X;
+//	public static final double PPKM_X = WIDTH / SECTORSIZE_X;
+//	public static final double PPKM_Y = HEIGHT / SECTORSIZE_Y;
+//	public static final double PPKM_Z = HEIGHT / SECTORSIZE_Z;
+//	public static final double PPKM_SQ = (HEIGHT * WIDTH) / (SECTORSIZE_X * SECTORSIZE_Y);
 	
 	
 	public static SpriteSheet Sprites;
 	
 	private static final int VER_MAJOR = 0;
 	private static final int VER_MINOR = 0;
-	private static final int VER_REV = 1;
-	private static final String VER_REL = "a";
+	private static final int VER_REV = 9;
+	private static final String VER_REL = "p";
 	
 	private Hud hud;
 	private BufferedImage bufimg = new BufferedImage(WIDTH,HEIGHT,BufferedImage.TYPE_INT_RGB);
@@ -112,7 +115,9 @@ public class StarSector extends Canvas implements Runnable{
 		} catch(IOException e){
 			e.printStackTrace();
 		}
-		Static Test = new Static(STYPE.STATION);	
+		// Testing, feel free to remove.
+		Static Test = new Static(STYPE.STATION);
+		Mobile Mob = new Mobile(MTYPE.M1, Test, null);
 	}
 	
 	private void render(){
