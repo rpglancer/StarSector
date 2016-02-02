@@ -1,5 +1,6 @@
 package ss.lib;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.util.Vector;
 
@@ -20,7 +21,7 @@ public class Static extends Entity {
 		this.Name = "TestStation";
 		this.loc = new Coords(StarSector.WIDTH / 2, StarSector.HEIGHT / 2, 120);
 		this.Queue = new Vector<Mobile>();
-		this.canSelect = true;
+		this.canSelect = false;
 		Tracon.addStatic(this);
 	}
 
@@ -49,6 +50,9 @@ public class Static extends Entity {
 	public void render(Graphics g, boolean p){
 		if(p) Draw.sprite_centered(g, StarSector.Sprites.grabImage(type.getSpriteC(), type.getSpriteR(), 16, 16), this.loc.GetX(), this.loc.GetY());
 		else Draw.sprite_centered(g, StarSector.Sprites.grabImage(type.getSpriteC(), type.getSpriteR(), 16, 16), this.loc.GetX(), this.loc.GetZ());
+		Draw.circle_centered(g, loc, (int)(10 * StarSector.PPKM), Color.orange, p);
+		Draw.circle_centered(g, loc, (int)(20 * StarSector.PPKM), Color.orange, p);
+		Draw.circle_centered(g, loc, (int)(30 * StarSector.PPKM), Color.orange, p);
 	}
 
 	@Override

@@ -3,7 +3,9 @@ package ss.lib;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 
 import ss.StarSector;
@@ -94,4 +96,14 @@ public class Text {
 		}
 	}
 	
+	public static void RotateText(Graphics g, Font f, int x, int y, String text){
+		Font prevF = g.getFont();
+		g.setFont(f);
+		Graphics2D G2D = (Graphics2D)g;
+		G2D.drawString("Test", x, y);
+		AffineTransform at = AffineTransform.getRotateInstance(Math.PI / 2,x,y);	
+		G2D.transform(at);	
+		G2D.transform(new AffineTransform());
+		G2D.setFont(prevF);
+	}
 }

@@ -44,11 +44,21 @@ public class Tracon {
 		Statics.push(s);
 	}
 	
+	@Deprecated
+	/**
+	 * Selects and returns an entity at the specified MouseEvent coordinates.
+	 * @param arg0	MouseEvent
+	 * @return
+	 */
 	public static Entity selectEntityAt(MouseEvent arg0){
+		double x,y;
 		for(int i = 0; i < Statics.size(); i++){
 			Entity Temp = Statics.get(i);
-			if(Temp.loc.GetX() - (StarSector.SPRITEWIDTH / 2) <= arg0.getX() && Temp.loc.GetX() + (StarSector.SPRITEWIDTH / 2) >= arg0.getX() &&
-				Temp.loc.GetY() - (StarSector.SPRITEHEIGHT / 2) <= arg0.getY() && Temp.loc.GetY() + (StarSector.SPRITEHEIGHT / 2) >= arg0.getY()){
+			x = Temp.loc.GetX();
+			if(Hud.getP()) y = Temp.loc.GetY();
+			else y = Temp.loc.GetZ();
+			if(x - (StarSector.SPRITEWIDTH / 2) <= arg0.getX() && x + (StarSector.SPRITEWIDTH / 2) >= arg0.getX() &&
+				y - (StarSector.SPRITEHEIGHT / 2) <= arg0.getY() && y + (StarSector.SPRITEHEIGHT / 2) >= arg0.getY()){
 				if(Temp.canSelect){
 					Temp.select();
 					return Temp;
@@ -60,8 +70,37 @@ public class Tracon {
 		}
 		for(int i = 0; i < Mobiles.size(); i++){
 			Entity Temp = Mobiles.get(i);
-			if(Temp.loc.GetX() - (StarSector.SPRITEWIDTH / 2) <= arg0.getX() && Temp.loc.GetX() + (StarSector.SPRITEWIDTH / 2) >= arg0.getX() &&
-					Temp.loc.GetY() - (StarSector.SPRITEHEIGHT / 2) <= arg0.getY() && Temp.loc.GetY() + (StarSector.SPRITEHEIGHT / 2) >= arg0.getY()){
+			x = Temp.loc.GetX();
+			if(Hud.getP()) y = Temp.loc.GetY();
+			else y = Temp.loc.GetZ();
+			if(x - (StarSector.SPRITEWIDTH / 2) <= arg0.getX() && x + (StarSector.SPRITEWIDTH / 2) >= arg0.getX() &&
+					y - (StarSector.SPRITEHEIGHT / 2) <= arg0.getY() && y + (StarSector.SPRITEHEIGHT / 2) >= arg0.getY()){
+				if(Temp.canSelect){
+					Temp.select();
+					return Temp;
+				}
+			}
+			else{
+				Temp.deselect();
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * Selects and returns a {@link Mobile} at the specified MouseEvent coordinates.
+	 * @param arg0	MouseEvent
+	 * @return
+	 */
+	public static Mobile selectMobileAt(MouseEvent arg0){
+		double x,y;
+		for(int i = 0; i < Mobiles.size(); i++){
+			Mobile Temp = (Mobile)Mobiles.get(i);
+			x = Temp.loc.GetX();
+			if(Hud.getP()) y = Temp.loc.GetY();
+			else y = Temp.loc.GetZ();
+			if(x - (StarSector.SPRITEWIDTH / 2) <= arg0.getX() && x + (StarSector.SPRITEWIDTH / 2) >= arg0.getX() &&
+					y - (StarSector.SPRITEHEIGHT / 2) <= arg0.getY() && y + (StarSector.SPRITEHEIGHT / 2) >= arg0.getY()){
 				if(Temp.canSelect){
 					Temp.select();
 					return Temp;

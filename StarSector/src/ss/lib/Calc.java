@@ -26,8 +26,6 @@ public class Calc {
 	 * @return	The movement vector.
 	 */
 	public static Coords mVector(Mobile m){
-		System.out.println("Current Course: " + (int)m.getHdg() + "." + (int)m.getMK());
-//		double spd = MPS(m.getSpd() * StarSector.PPKM);
 		double spd = KMPS(m.getSpd());
 		double vv[] = getP(m.getHdg(), m.getMK());
 		double ex = spd * vv[0];
@@ -35,8 +33,10 @@ public class Calc {
 		double ez = spd * vv[2];
 		if(m.getHdg() > 180) ex = -ex;
 		if(m.getHdg() > 270 || m.getHdg() < 90) ey = -ey;
-		if(m.getMK() < 90) ez = -ez;	
-		System.out.println("Velocity Vector: " + ex + ", " + ey + ", " + ez);
+		if(m.getMK() < 90) ez = -ez;
+		ex *= StarSector.PPKM;
+		ey *= StarSector.PPKM;
+		ez *= StarSector.PPKM;
 		return new Coords(ex, ey, ez);
 	}
 	
@@ -47,7 +47,9 @@ public class Calc {
 	 * @return		<b>Coords</b> The projected coordinates of a mobile.
 	 */
 	public static Coords dVector(Mobile m, int mins){
-		double spd = KMPS(m.getSpd()) * (StarSector.SweepSize * mins);
+		double spd = KMPS(m.getSpd());
+		spd *= 10;
+		spd *= mins;
 		double vv[] = getP(m.getHdg(), m.getMK());
 		double ex = spd * vv[0];
 		double ey = spd * vv[1];
@@ -55,6 +57,9 @@ public class Calc {
 		if(m.getHdg() > 180) ex = -ex;
 		if(m.getHdg() > 270 || m.getHdg() < 90) ey = -ey;
 		if(m.getMK() < 90) ez = -ez;
+		ex *= StarSector.PPKM;
+		ey *= StarSector.PPKM;
+		ez *= StarSector.PPKM;
 		ex += m.loc.GetX();
 		ey += m.loc.GetY();
 		ez += m.loc.GetZ();
@@ -67,7 +72,7 @@ public class Calc {
 	 * @return	<b>Double</b> Kilometers per Sweep.
 	 */
 	public static double KMPS(double spd){
-		System.out.println("Calculated KMPS: " + (spd / 1000 * StarSector.SweepLength));
+//		System.out.println("Calculated KMPS: " + (spd / 1000 * StarSector.SweepLength));
 		return (spd / 1000) * StarSector.SweepLength;
 	}
 	
@@ -84,24 +89,24 @@ public class Calc {
 		if(zpct == 1){
 			pct[0] = pct[1] = 0;
 			pct[2] = 1;
-			System.out.println("Calculated Pcts: " + pct[0] + ", " + pct[1] + ", " + pct[2]);
-			System.out.println("Calculated PctTot: " + (pct[0]+pct[1]+pct[2]));
+//			System.out.println("Calculated Pcts: " + pct[0] + ", " + pct[1] + ", " + pct[2]);
+//			System.out.println("Calculated PctTot: " + (pct[0]+pct[1]+pct[2]));
 			return pct;
 		}
 		else if(hdg == 360 || hdg == 180 || hdg == 0){
 			pct[0] = 0;
 			pct[1] = 1 - zpct;
 			pct[2] = zpct;
-			System.out.println("Calculated Pcts: " + pct[0] + ", " + pct[1] + ", " + pct[2]);
-			System.out.println("Calculated PctTot: " + (pct[0]+pct[1]+pct[2]));
+//			System.out.println("Calculated Pcts: " + pct[0] + ", " + pct[1] + ", " + pct[2]);
+//			System.out.println("Calculated PctTot: " + (pct[0]+pct[1]+pct[2]));
 			return pct;
 		}
 		else if(hdg == 90 || hdg == 270){
 			pct[0] = 1 - zpct;
 			pct[1] = 0;
 			pct[2] = zpct;
-			System.out.println("Calculated Pcts: " + pct[0] + ", " + pct[1] + ", " + pct[2]);
-			System.out.println("Calculated PctTot: " + (pct[0]+pct[1]+pct[2]));
+//			System.out.println("Calculated Pcts: " + pct[0] + ", " + pct[1] + ", " + pct[2]);
+//			System.out.println("Calculated PctTot: " + (pct[0]+pct[1]+pct[2]));
 			return pct;
 		}
 		else{
@@ -112,8 +117,8 @@ public class Calc {
 			pct[2] = zpct;
 			pct[0] -= (pct[2] / 2);
 			pct[1] -= (pct[2] / 2);
-			System.out.println("Calculated Pcts: " + pct[0] + ", " + pct[1] + ", " + pct[2]);
-			System.out.println("Calculated PctTot: " + (pct[0]+pct[1]+pct[2]));
+//			System.out.println("Calculated Pcts: " + pct[0] + ", " + pct[1] + ", " + pct[2]);
+//			System.out.println("Calculated PctTot: " + (pct[0]+pct[1]+pct[2]));
 			return pct;
 		}
 	}

@@ -62,10 +62,6 @@ public class Coords {
 	 * @param v	Coords values to be added.
 	 */
 	public void add(Coords v){
-		double ax = Math.abs(v.x);
-		double ay = Math.abs(v.y);
-		double az = Math.abs(v.z);
-		System.out.println("Distance Moved: " + (ax + ay + az));
 		x += v.x;
 		y += v.y;
 		z += v.z;

@@ -31,19 +31,12 @@ public class StarSector extends Canvas implements Runnable{
 	public static final int HEIGHT = 480;
 	public static final int WIDTH = 720;
 	
-	public static final int SECTORSIZE_X = 150;
-	public static final int SECTORSIZE_Y = 100;
-	public static final int SECTORSIZE_Z = 100;
+	public static final int SECTORSIZE_X = 360;
 	
 	public static final int SweepSize = 10;
 	public static final int SweepLength = 60 / SweepSize;
 	
 	public static final double PPKM = WIDTH / SECTORSIZE_X;
-//	public static final double PPKM_X = WIDTH / SECTORSIZE_X;
-//	public static final double PPKM_Y = HEIGHT / SECTORSIZE_Y;
-//	public static final double PPKM_Z = HEIGHT / SECTORSIZE_Z;
-//	public static final double PPKM_SQ = (HEIGHT * WIDTH) / (SECTORSIZE_X * SECTORSIZE_Y);
-	
 	
 	public static SpriteSheet Sprites;
 	
@@ -117,7 +110,7 @@ public class StarSector extends Canvas implements Runnable{
 		}
 		// Testing, feel free to remove.
 		Static Test = new Static(STYPE.STATION);
-		Mobile Mob = new Mobile(MTYPE.M1, Test, null);
+		Mobile Mob = new Mobile(MTYPE.M5, Test, null);
 	}
 	
 	private void render(){

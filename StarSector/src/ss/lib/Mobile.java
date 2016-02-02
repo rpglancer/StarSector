@@ -36,6 +36,7 @@ public class Mobile extends Entity{
 	}
 	
 	public Mobile(MTYPE type, Static origin, Static destination){
+		this.canSelect = true;
 		this.type = type;
 		this.name = "ShiggyDoo";
 		this.origin = origin;
@@ -75,12 +76,16 @@ public class Mobile extends Entity{
 		return (double)mkCurrent;
 	}
 	
+	public String getName(){
+		return name;
+	}
+	
 	@Override
 	public void render(Graphics g, boolean p){
+		if(isSelected)Draw.history(g, history);
 		if(p) Draw.sprite_centered(g, StarSector.Sprites.grabImage(type.getSpriteC(), type.getSpriteR(), 16, 16), this.loc.GetX(), this.loc.GetY());
 		else Draw.sprite_centered(g, StarSector.Sprites.grabImage(type.getSpriteC(), type.getSpriteR(), 16, 16), this.loc.GetX(), this.loc.GetZ());
-		Draw.square_centered(g, this.loc, (int)(2 * StarSector.PPKM), Color.cyan, Hud.getP());
-		if(isSelected)Draw.history(g, history);
+		if(isSelected)Draw.square_centered(g, this.loc, (int)(2 * StarSector.PPKM), Color.cyan, Hud.getP());
 		Draw.line(g, loc, dir, Color.green, p);
 	}
 	

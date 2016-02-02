@@ -16,19 +16,22 @@ public enum RESPONSE {
 	EIGHT	("8",	Color.green, Color.darkGray),
 	NINE	("9",	Color.green, Color.darkGray),
 	MARK	(".",	Color.green, Color.darkGray),
-	MVS		("MVS",	Color.green, Color.darkGray),
-	DCT		("DCT",	Color.green, Color.darkGray),
-	APRCLR	("APRCLR",	Color.green, Color.darkGray),
-	SPD		("SPEED",	Color.green, Color.darkGray),
-	HDG		("HEADING",	Color.green, Color.darkGray),
-	HOLD	("HOLD",	Color.green, Color.darkGray),
-	XMIT	("XMIT",	Color.green, Color.darkGray),
-	DISR	("DISREG",	Color.green, Color.darkGray),
+	MVS		("MVS",	Color.green, Color.red),
+	DCT		("DCT",	Color.green, Color.red),
+	APRCLR	("APR",	Color.green, Color.red),
+	SPD		("SPEED",	Color.green, Color.red),
+	HDG		("HEADING",	Color.green, Color.red),
+	HOLD	("HOLD",	Color.green, Color.red),
+	XMIT	("XMIT",	Color.green, Color.green),
+	DISR	("DISREG",	Color.green, Color.green),
 	ACPT	("ACPT",	Color.green, Color.darkGray),
 	CNCL	("CNCL",	Color.green, Color.darkGray),
+	RULER	("ruler",	Color.green, Color.red),
 	XY		("x/y",		Color.cyan, Color.cyan),
 	XZ		("x/z",		Color.cyan, Color.cyan),
-	CLOCK	("\0",		Color.cyan, Color.cyan);
+	CLOCK	("\0",		Color.cyan, Color.cyan),
+	ENTITY	("\0",		Color.cyan,	Color.cyan),
+	OPS		("ops",		Color.green, Color.yellow);
 	
 	private String text;
 	private Color primary;
