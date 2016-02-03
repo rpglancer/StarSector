@@ -16,7 +16,7 @@ public class Tracon {
 
 	private static LinkedList<Entity> Mobiles = new LinkedList<Entity>();
 	private static LinkedList<Entity> Statics = new LinkedList<Entity>();
-	
+	@Deprecated
 	public Tracon(){
 	}
 	
