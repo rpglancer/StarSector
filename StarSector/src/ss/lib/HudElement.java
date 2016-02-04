@@ -32,9 +32,8 @@ public class HudElement {
 	}
 	
 	public boolean wasClicked(int x, int y){
-		if(x >= elementArea.x && x <= elementArea.x + elementArea.width &&
-				y >= elementArea.y && y <= elementArea.y + elementArea.height) return true;
-		return false;
+		return (x >= elementArea.x && x <= elementArea.x + elementArea.width &&
+				y >= elementArea.y && y <= elementArea.y + elementArea.height);
 	}
 	
 	/**
@@ -88,30 +87,32 @@ public class HudElement {
 	
 	public HUDMODE getElementMode(){
 		return element.getMode();
-//		return elementMode;
 	}
 	
 	public RESPONSE getElementResponse(){
 		return element.getResponse();
-//		return elementResponse;
 	}
 	
 	public Rectangle getElementArea(){
 		return elementArea;
 	}
 	
+	@Deprecated
 	public int getX(){
 		return elementArea.x;
 	}
 	
+	@Deprecated
 	public int getY(){
 		return elementArea.y;
 	}
 	
+	@Deprecated
 	public int getHeight(){
 		return elementArea.height;
 	}
 	
+	@Deprecated
 	public int getWidth(){
 		return elementArea.width;
 	}
@@ -121,15 +122,26 @@ public class HudElement {
 //		elementResponse = response;
 	}
 	
+	/**
+	 * Returns the availability status of this HudElement.<br>
+	 * HudElements that are available [true] will be drawn and can be clicked on the hud.<br>
+	 * HudElements that are not available [false] will still be drawn but cannot be interacted with via the hud.
+	 * @return The current status of this HudElement.
+	 */
 	public boolean isActive(){
 		return isActive;
 	}
 	
 	public void toggle(){
-		if(isActive)isActive = false;
-		else isActive = true;
+		isActive = !isActive;
 	}
 	
+	/**
+	 * Sets the availability status of this HudElement.<br>
+	 * HudElements that are available [true] will be drawn and can be clicked on the hud.<br>
+	 * HudElements that are not available [false] will still be drawn but cannot be interacted with via the hud.
+	 * @param status The desired status of this HudElement.
+	 */
 	public void setActive(boolean status){
 		isActive = status;
 	}

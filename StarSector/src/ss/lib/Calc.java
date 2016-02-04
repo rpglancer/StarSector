@@ -28,6 +28,7 @@ public class Calc {
 	public static Coords mVector(Mobile m){
 		double spd = KMPS(m.getSpd());
 		double vv[] = getP(m.getHdg(), m.getMK());
+		System.out.println("mVector: " + vv[0] + ", " + vv[1] + ", " + vv[2]);
 		double ex = spd * vv[0];
 		double ey = spd * vv[1];
 		double ez = spd * vv[2];
@@ -89,37 +90,37 @@ public class Calc {
 		if(zpct == 1){
 			pct[0] = pct[1] = 0;
 			pct[2] = 1;
-//			System.out.println("Calculated Pcts: " + pct[0] + ", " + pct[1] + ", " + pct[2]);
-//			System.out.println("Calculated PctTot: " + (pct[0]+pct[1]+pct[2]));
 			return pct;
 		}
 		else if(hdg == 360 || hdg == 180 || hdg == 0){
 			pct[0] = 0;
 			pct[1] = 1 - zpct;
 			pct[2] = zpct;
-//			System.out.println("Calculated Pcts: " + pct[0] + ", " + pct[1] + ", " + pct[2]);
-//			System.out.println("Calculated PctTot: " + (pct[0]+pct[1]+pct[2]));
 			return pct;
 		}
 		else if(hdg == 90 || hdg == 270){
 			pct[0] = 1 - zpct;
 			pct[1] = 0;
 			pct[2] = zpct;
-//			System.out.println("Calculated Pcts: " + pct[0] + ", " + pct[1] + ", " + pct[2]);
-//			System.out.println("Calculated PctTot: " + (pct[0]+pct[1]+pct[2]));
 			return pct;
 		}
+
 		else{
-			for(i = hdg + 360; i > 90; i -= 90);
-			zpct *= 0.666666666666;
-			pct[0] = i / 90;
-			pct[1] = 1 - i / 90;
+			zpct *= 0.666666666666666667;
 			pct[2] = zpct;
-			pct[0] -= (pct[2] / 2);
-			pct[1] -= (pct[2] / 2);
-//			System.out.println("Calculated Pcts: " + pct[0] + ", " + pct[1] + ", " + pct[2]);
-//			System.out.println("Calculated PctTot: " + (pct[0]+pct[1]+pct[2]));
+			if(hdg > 270) i = hdg - 270;
+			else if(hdg > 180) i = hdg - 180;
+			else if(hdg > 90) i = hdg - 90;
+			else i = hdg;
+			if(hdg > 0 && hdg < 90 || hdg > 180 && hdg < 270){
+				pct[0] = i/90 - pct[2]/2;
+				pct[1] = 1 - i/90 - pct[2]/2;
+			}
+			else{
+				pct[0] = 1 - i/90 - pct[2]/2;
+				pct[1] = i/90 - pct[2]/2;
+			}
+		}
 			return pct;
 		}
-	}
 }

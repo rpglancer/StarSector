@@ -29,7 +29,7 @@ public class Hud implements MouseMotionListener, MouseListener {
 	
 	@Deprecated
 	private Entity selectedEntity;
-	
+
 	private Mobile selectedMobile;
 	
 	private static boolean hudPerspective = true;				// true = x/y, false = x/z
@@ -66,25 +66,15 @@ public class Hud implements MouseMotionListener, MouseListener {
 		}
 		initRuler();
 	}
-	
-	public void tick(){
-		Tracon.tick();
-	}
-	
+		
 	public static boolean getP(){
 		return hudPerspective;
 	}
-	
-	// Render Tracon Objects
-	// Render Base UI
-	// Render Contextual UI (if applicable)
-	public void Render(Graphics G){
-		Tracon.Render(G, hudPerspective);
-		renderBaseHud(G);
-		if(hudMode == HUDMODE.OPS)renderOps(G);
-		if(hudMode == HUDMODE.INPUT)renderInput(G);
-	}
 
+	public static int getTimeProject(){
+		return hudTimeProjection;
+	}
+	
 	@Override
 	public void mouseClicked(MouseEvent arg0) {
 		// TODO Auto-generated method stub
@@ -160,30 +150,34 @@ public class Hud implements MouseMotionListener, MouseListener {
 		
 	}
 	
-	private void hudProcess(HudElement element){
-		if(selectedMobile != null){
-			switch(hudMode){
-			case INPUT:
-				break;
-			case OPS:
-				for(int i = 1; i < opsElements.size(); i++){
-					opsElements.get(i).setActive(selectedMobile.getOps(i));
-				}
-				break;
-			case OVERVIEW:
-				break;
-			default:
-				break;	
-			}
+	// Render Tracon Objects
+	// Render Base UI
+	// Render Contextual UI (if applicable)
+	public void Render(Graphics G){
+		Tracon.Render(G, hudPerspective);
+		renderBaseHud(G);
+		if(hudMode == HUDMODE.OPS)renderOps(G);
+		if(hudMode == HUDMODE.INPUT){
+			renderOps(G);
+			renderInput(G);
 		}
-//		System.out.println("Start hud processing with status: " + hudMode.toString());
-//		System.out.println("Element response of: " + element.getElementResponse().toString());
+	}
+	
+	public void tick(){
+		Tracon.tick();
+	}
+	
+	private void hudProcess(HudElement element){
 		switch(element.getElementResponse()){
 		case APRCLR:
-			xmit.setApproach(!xmit.getApproach());
+			if(selectedMobile.getOps(ELEMENT.HUD_OPS_APR.getIndex()))
+				xmit.setApproach(!xmit.getApproach());
 			break;
 		case CNCL:
-			hudMode = HUDMODE.OPS;
+			if(inputElements.get(ELEMENT.HUD_INP_CAN.getIndex()).isActive()){
+				xmit.initHdg();
+				hudMode = HUDMODE.OPS;
+			}
 			break;
 		case CTCT:
 			if(selectedMobile.getOps(ELEMENT.HUD_OPS_CON.getIndex())){
@@ -194,7 +188,8 @@ public class Hud implements MouseMotionListener, MouseListener {
 			hudMode = HUDMODE.OVERVIEW;
 			break;
 		case DCT:
-			xmit.setDirect(!xmit.getDirect());
+			if(selectedMobile.getOps(ELEMENT.HUD_OPS_DCT.getIndex()))
+				xmit.setDirect(!xmit.getDirect());
 			break;
 		case EIGHT:
 			break;
@@ -202,10 +197,22 @@ public class Hud implements MouseMotionListener, MouseListener {
 			break;
 		case FOUR:
 			break;
+		case HDG:
+			if(selectedMobile.getOps(ELEMENT.HUD_OPS_HDG.getIndex())){
+				xmit.initHdg();
+				refreshInputElements();
+				hudMode = HUDMODE.INPUT;
+			}
+			break;
 		case HOLD:
-			xmit.setHold(!xmit.getHold());
+			if(selectedMobile.getOps(ELEMENT.HUD_OPS_HLD.getIndex()))
+				xmit.setHold(!xmit.getHold());
 			break;
 		case MARK:
+			if(inputElements.get(ELEMENT.HUD_INP_MRK.getIndex()).isActive()){
+				xmit.setHeading(-1);
+				refreshInputElements();
+			}
 			break;
 		case MVS:
 			break;
@@ -215,9 +222,19 @@ public class Hud implements MouseMotionListener, MouseListener {
 			System.out.println("WARN: NULL PROCESSED");
 			break;
 		case ONE:
+			if(inputElements.get(ELEMENT.HUD_INP_ONE.getIndex()).isActive()){
+				xmit.setHeading(1);
+				if(xmit.getHdgStatus() == 0)
+					hudMode = HUDMODE.OPS;
+				else
+					refreshInputElements();
+			}
 			break;
 		case OPS:
 			if(hudMode == HUDMODE.OVERVIEW && ovwElements.get(ELEMENT.HUD_OVW_OPS.getIndex()).isActive()){
+				for(int i = 1; i < opsElements.size(); i++){
+					opsElements.get(i).setActive(selectedMobile.getOps(i));
+				}
 				xmit = new Xmit(selectedMobile);
 				hudMode = HUDMODE.OPS;
 			}
@@ -235,6 +252,10 @@ public class Hud implements MouseMotionListener, MouseListener {
 		case TWO:
 			break;
 		case XMIT:
+			if(selectedMobile.getOps(ELEMENT.HUD_OPS_XMT.getIndex())){
+				selectedMobile.call(xmit);
+				hudMode = HUDMODE.OVERVIEW;
+			}	
 			break;
 		case XY:
 			hudPerspective = false;
@@ -249,6 +270,25 @@ public class Hud implements MouseMotionListener, MouseListener {
 		default:
 			break;
 		
+		}
+	}
+	
+	private void initRuler(){
+		for(int i = 0; i < StarSector.HEIGHT; i++){
+			if(i % (10 * StarSector.PPKM) == 0){
+				rulerElementsY.add(i);
+			}
+		}
+		for(int i = 0; i < StarSector.WIDTH; i++){
+			if(i % (10 * StarSector.PPKM) == 0){
+				rulerElementsX.add(i);
+			}
+		}
+	}
+	
+	private void refreshInputElements(){
+		for(int i = 1; i < inputElements.size(); i++){
+			inputElements.get(i).setActive(xmit.getInputAvail(i));
 		}
 	}
 	
@@ -274,6 +314,33 @@ public class Hud implements MouseMotionListener, MouseListener {
 				Text.BoxText(G, Fonts.RadarText, ovwElements.get(i).getElementArea(), ALIGNH.CENTER, ALIGNV.MIDDLE, dateF.format(td));
 			if(ovwElements.get(i).getElementResponse() == RESPONSE.ENTITY && selectedMobile != null)
 				Text.BoxText(G, Fonts.RadarText, ovwElements.get(i).getElementArea(), ALIGNH.CENTER, ALIGNV.MIDDLE, selectedMobile.getName());	
+		}
+		G2D.setColor(PrevC);
+	}
+
+	private void renderInput(Graphics G){
+		Graphics2D G2D = (Graphics2D)G;
+		Color PrevC = G2D.getColor();
+		G2D.setColor(Color.black);
+		G2D.fill(inputElements.get(0).getElementArea());
+		G2D.setColor(Color.darkGray);
+		G2D.draw(inputElements.get(0).getElementArea());
+		for(int i = 1; i < inputElements.size(); i++){
+			if(inputElements.get(i).isActive()){
+				G2D.setColor(Color.darkGray);
+				G2D.fill(inputElements.get(i).getElementArea());
+				G2D.setColor(Color.green);
+				G2D.draw(inputElements.get(i).getElementArea());
+				Text.BoxText(G, Fonts.HudText, inputElements.get(i).getElementArea(), ALIGNH.CENTER, ALIGNV.MIDDLE, inputElements.get(i).getElementResponse().getText());
+			}
+			else{
+				G2D.setColor(Color.darkGray);
+				G2D.fill(inputElements.get(i).getElementArea());
+				G2D.setColor(Color.red);
+				G2D.draw(inputElements.get(i).getElementArea());
+				G2D.setColor(Color.black);
+				Text.BoxText(G, Fonts.HudText, inputElements.get(i).getElementArea(), ALIGNH.CENTER, ALIGNV.MIDDLE, inputElements.get(i).getElementResponse().getText());
+			}
 		}
 		G2D.setColor(PrevC);
 	}
@@ -328,42 +395,6 @@ public class Hud implements MouseMotionListener, MouseListener {
 		G2D.setColor(PrevC);
 	}
 	
-	private void renderInput(Graphics G){
-		Graphics2D G2D = (Graphics2D)G;
-		Color PrevC = G2D.getColor();
-		for(int i = 0; i < inputElements.size(); i++){
-			G2D.setColor(inputElements.get(i).getColorP());
-			G2D.fill(inputElements.get(i).getElementArea());
-			G2D.setColor(inputElements.get(i).getColorS());
-			G2D.draw(inputElements.get(i).getElementArea());
-			G2D.setColor(inputElements.get(i).getElementResponse().getColorPri());
-			Text.BoxText(G, Fonts.RadarText, inputElements.get(i).getElementArea(), ALIGNH.CENTER, ALIGNV.MIDDLE, inputElements.get(i).getElementResponse().getText());
-		}
-		G2D.setColor(PrevC);
-	}
-
-	public static int getTimeProject(){
-		return hudTimeProjection;
-	}
-	
-	private void initRuler(){
-		for(int i = 0; i < StarSector.HEIGHT; i++){
-			if(i % (10 * StarSector.PPKM) == 0){
-				rulerElementsY.add(i);
-			}
-		}
-		for(int i = 0; i < StarSector.WIDTH; i++){
-			if(i % (10 * StarSector.PPKM) == 0){
-				rulerElementsX.add(i);
-			}
-		}
-	}
-	
-	private void toggleRuler(){
-		if(drawRuler) drawRuler = false;
-		else drawRuler = true;
-	}
-	
 	private void renderRuler(Graphics G){
 		Color prevC = G.getColor();
 		Font prevF = G.getFont();
@@ -384,4 +415,10 @@ public class Hud implements MouseMotionListener, MouseListener {
 		G.setColor(prevC);
 		G.setFont(prevF);
 	}
+	
+	private void toggleRuler(){
+		if(drawRuler) drawRuler = false;
+		else drawRuler = true;
+	}
+	
 }

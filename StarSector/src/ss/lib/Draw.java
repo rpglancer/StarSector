@@ -67,7 +67,7 @@ public class Draw {
 		}
 		else{
 			sy = (int)begin.GetZ();
-			ey = (int)begin.GetZ();
+			ey = (int)end.GetZ();
 		}
 		G.drawLine(sx, sy, ex, ey);
 		G.setColor(prevC);

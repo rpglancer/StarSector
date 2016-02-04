@@ -13,21 +13,36 @@ public class Mobile extends Entity{
 	private String name;
 	private MTYPE type;
 	private String owner;
-	private Static destination		= null;
-	private Static origin			= null;
-	private Static waypoint			= null;
+	private Static destination		= null;			// The Static to which this Mobile is destined.
+	private Static origin			= null;			// The Static from which this Mobile originated.
+	private Static waypoint			= null;			// The Static waypoint to which this mobile is currently traveling.
 	
-	private double accelCurrent		= 0;
-	private double accelMin			= 0;
-	private double accelMax			= 0;
-	private double speedCurrent		= 0;
-	private double speedMax			= 0;
+	private double accelMax			= 0;			// The maximum acceleration rate of the Mobile [in m/s]
+	private double speedCurrent		= 0;			// The current speed of the Mobile [in m/s]
+	private double speedMax			= 0;			// The maximum speed of the Mobile [in m/s]
 	
-	private int hdgCurrent			= 0;			// Contains heading as viewed from an x/y perspective 0-359
-	private int hdgDesired			= 0;
-	private int mkCurrent			= 0;			// Contains the marked heading for traversal in an x/z perspective. 270-90
-	private int mkDesired			= 0;
+	private int hdgCurrent			= 0;			// The current heading of the Mobile as viewed from an x/y perspective [0-359]
+	private int hdgDesired			= 0;			// The desired heading of the Mobile as viewed from an x/y perspective [0-359]
+	private int mkCurrent			= 0;			// The current mark of the Mobile for traversal in an x/z perspective. [0-180]
+	private int mkDesired			= 0;			// The desired mark of the Mobile for traversal in an x/z perspective. [0-180]
 	
+	private double turnRateMax		= 5;
+	
+	/**
+	 * Boolean values determining which operations are currently being actively applied to this mobile.<br>
+	 * They can be checked publicly by using {@link Mobile#getOpsActive(int)}.<br>
+	 * <br>
+	 * Current Index Values:<br>
+	 * [0] unused<br>
+	 * [1] unused<br>
+	 * [2] unused<br>
+	 * [3] HLD<br>
+	 * [4] DCT<br>
+	 * [5] APR<br>
+	 * [6] unused<br>
+	 * [7] unused<br>
+	 * [8] unused<br>
+	 */
 	private boolean[] mobOpsAct = {false, false, false, false, false, false, false, false, false}; 
 	
 	/**
@@ -38,7 +53,7 @@ public class Mobile extends Entity{
 	 * [0] unused<br>
 	 * [1] heading<br>
 	 * [2] speed<br>
-	 * [3] MVS<br>
+	 * [3] HLD<br>
 	 * [4] DCT<br>
 	 * [5] APR<br>
 	 * [6] XMIT<br>
@@ -47,17 +62,14 @@ public class Mobile extends Entity{
 	 */
 	private boolean[] mobOps = {false, false, false, false, false, false, false, true, true}; 
 	
+	@Deprecated
 	private boolean[] mobInput = {false, false, false, false, false,
 								  false, false, false, false, false,
 								  false, false, false };
 	
-	private Coords dir;
+	private Coords dir;		//	Mobile's Directional Vector
 	
 	private Vector<Coords> history = new Vector<Coords>();
-	
-	public Mobile(){
-		
-	}
 	
 	public Mobile(MTYPE type, Static origin, Static destination){
 		this.canSelect = true;
@@ -66,12 +78,11 @@ public class Mobile extends Entity{
 		this.origin = origin;
 		this.destination = destination;
 		this.loc = new Coords(origin.getLoc().GetX(), origin.getLoc().GetY(), origin.getLoc().GetZ());
-		hdgCurrent = 45;
+		hdgCurrent = 315;
 		hdgDesired = hdgCurrent;
-		mkCurrent = 90;
+		mkCurrent = 45;
 		mkDesired = mkCurrent;
-		accelCurrent = 5;
-		accelMax = accelCurrent;
+		accelMax = 5;
 		speedCurrent = 150;
 		speedMax = 150;
 		this.dir = Calc.dVector(this, Hud.getTimeProject());
@@ -88,8 +99,20 @@ public class Mobile extends Entity{
 		return this.loc;
 	}
 	
+	/**
+	 * Obtains the current speed of this Mobile.
+	 * @return Current speed in m/s.
+	 */
 	public double getSpd(){
 		return this.speedCurrent;
+	}
+	
+	/**
+	 * Obtains the maximum speed of this Mobile.
+	 * @return Maximum speed in m/s.
+	 */
+	public double getSpdMax(){
+		return speedMax;
 	}
 	
 	public double getHdg(){
@@ -126,6 +149,9 @@ public class Mobile extends Entity{
 	@Override
 	public void tick(){
 		updateHistory();
+		if(hdgCurrent != hdgDesired || mkCurrent != mkDesired){
+			turn();
+		}
 		loc.add(Calc.mVector(this));
 		dir = Calc.dVector(this, Hud.getTimeProject());
 	}
@@ -158,9 +184,16 @@ public class Mobile extends Entity{
 		return mobOps[i];
 	}
 	
+	/**
+	 * Returns the current boolean status for {@link Mobile#mobOpsAct}. <br>
+	 * <br>
+	 * <b>Note: </b><i>As a substitute for remembering which index value to use,</i><br> {@link ss.type.ELEMENT#getIndex()} <i>may be used.</i>
+	 * @param i The index value to be queried.
+	 * @return The boolean value at the queried index.
+	 */
 	public boolean getOpsActive(int i){
-		if(i > mobOps.length - 1){
-			System.out.println("WARN: getOps() index value out of range");
+		if(i > mobOpsAct.length - 1){
+			System.out.println("WARN: getOpsActive() index value out of range");
 			return false;
 		}
 		return mobOpsAct[i];
@@ -172,6 +205,47 @@ public class Mobile extends Entity{
 			return;
 		}
 		else mobOps[i] = value;
+	}
+	
+	private void turn(){
+		int recipOne = 360 - Calc.reciprocal(hdgCurrent) + hdgDesired;
+		int recipTwo = 0 + Calc.reciprocal(hdgCurrent) - hdgDesired;
+		if(recipOne >= 360) recipOne -= 360;
+		if(recipOne < 0) recipOne += 360;
+		if(recipTwo >= 360) recipTwo -= 360;
+		if(recipTwo < 0) recipTwo += 360;
+		// Turn left
+		if(recipOne <= recipTwo){
+			if(calcDegOffset(hdgCurrent, hdgDesired) < turnRateMax)
+				hdgCurrent -= calcDegOffset(hdgCurrent, hdgDesired);
+			else
+				hdgCurrent -= turnRateMax;
+			if(hdgCurrent < 0) hdgCurrent += 360;
+		}
+		// Turn right
+		else{
+			if(calcDegOffset(hdgCurrent, hdgDesired) < turnRateMax)
+				hdgCurrent += calcDegOffset(hdgCurrent, hdgDesired);
+			else
+				hdgCurrent += turnRateMax;
+			if(hdgCurrent >= 360) hdgCurrent -= 360;
+		}
+		// Adjust Mk
+		if(mkCurrent != mkDesired){
+			if(mkCurrent > mkDesired){
+				if(calcDegOffset(mkCurrent, mkDesired) < turnRateMax)
+					mkCurrent -= calcDegOffset(mkCurrent, mkDesired);
+				else
+					mkCurrent -= turnRateMax;
+			}
+			else{
+				if(calcDegOffset(mkCurrent, mkDesired) < turnRateMax)
+					mkCurrent += calcDegOffset(mkCurrent, mkDesired);
+				else
+					mkCurrent += turnRateMax;
+			}
+		}
+		System.out.println("DEBUG: " + hdgCurrent + "." + mkCurrent);
 	}
 	
 	public Static getWaypoint(){
@@ -186,6 +260,15 @@ public class Mobile extends Entity{
 			mobOpsAct[i] = xmit.getOpsActive(i);
 		}
 		waypoint = xmit.getWaypoint();
+	}
+	
+	private int calcDegOffset(int cur, int des){
+		int c,d;
+		if(cur <= 180) c = 0 + cur;
+		else c = 360 - cur;
+		if(des <= 180) d = 0 + des;
+		else d = 360 - des;
+		return (Math.abs(c - d));
 	}
 	
 }
