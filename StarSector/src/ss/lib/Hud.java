@@ -175,7 +175,7 @@ public class Hud implements MouseMotionListener, MouseListener {
 			break;
 		case CNCL:
 			if(inputElements.get(ELEMENT.HUD_INP_CAN.getIndex()).isActive()){
-				xmit.initHdg();
+//				xmit.initHdg();
 				hudMode = HUDMODE.OPS;
 			}
 			break;
@@ -191,15 +191,9 @@ public class Hud implements MouseMotionListener, MouseListener {
 			if(selectedMobile.getOps(ELEMENT.HUD_OPS_DCT.getIndex()))
 				xmit.setDirect(!xmit.getDirect());
 			break;
-		case EIGHT:
-			break;
-		case FIVE:
-			break;
-		case FOUR:
-			break;
 		case HDG:
 			if(selectedMobile.getOps(ELEMENT.HUD_OPS_HDG.getIndex())){
-				xmit.initHdg();
+				xmit.setDest(false);
 				refreshInputElements();
 				hudMode = HUDMODE.INPUT;
 			}
@@ -210,21 +204,107 @@ public class Hud implements MouseMotionListener, MouseListener {
 			break;
 		case MARK:
 			if(inputElements.get(ELEMENT.HUD_INP_MRK.getIndex()).isActive()){
-				xmit.setHeading(-1);
+				xmit.setInput(-1);
 				refreshInputElements();
 			}
 			break;
 		case MVS:
 			break;
-		case NINE:
-			break;
 		case NULL:
 			System.out.println("WARN: NULL PROCESSED");
 			break;
+		case SPD:
+			if(selectedMobile.getOps(ELEMENT.HUD_OPS_SPD.getIndex())){
+				xmit.setDest(true);
+				refreshInputElements();
+				hudMode = HUDMODE.INPUT;
+			}
+			break;
+		case ZER:
+			if(inputElements.get(ELEMENT.HUD_INP_ZER.getIndex()).isActive()){
+				xmit.setInput(0);
+				if(xmit.getInputStatus() == 0)
+					hudMode = HUDMODE.OPS;
+				else
+					refreshInputElements();
+			}
+			break;
 		case ONE:
 			if(inputElements.get(ELEMENT.HUD_INP_ONE.getIndex()).isActive()){
-				xmit.setHeading(1);
-				if(xmit.getHdgStatus() == 0)
+				xmit.setInput(1);
+				if(xmit.getInputStatus() == 0)
+					hudMode = HUDMODE.OPS;
+				else
+					refreshInputElements();
+			}
+			break;
+		case TWO:
+			if(inputElements.get(ELEMENT.HUD_INP_TWO.getIndex()).isActive()){
+				xmit.setInput(2);
+				if(xmit.getInputStatus() == 0)
+					hudMode = HUDMODE.OPS;
+				else
+					refreshInputElements();
+			}
+			break;
+		case THREE:
+			if(inputElements.get(ELEMENT.HUD_INP_THR.getIndex()).isActive()){
+				xmit.setInput(3);
+				if(xmit.getInputStatus() == 0)
+					hudMode = HUDMODE.OPS;
+				else
+					refreshInputElements();
+			}
+			break;
+		case FOUR:
+			if(inputElements.get(ELEMENT.HUD_INP_FOU.getIndex()).isActive()){
+				xmit.setInput(4);
+				if(xmit.getInputStatus() == 0)
+					hudMode = HUDMODE.OPS;
+				else
+					refreshInputElements();
+			}
+			break;
+		case FIVE:
+			if(inputElements.get(ELEMENT.HUD_INP_EIG.getIndex()).isActive()){
+				xmit.setInput(5);
+				if(xmit.getInputStatus() == 0)
+					hudMode = HUDMODE.OPS;
+				else
+					refreshInputElements();
+			}
+			break;
+		case SIX:
+			if(inputElements.get(ELEMENT.HUD_INP_SIX.getIndex()).isActive()){
+				xmit.setInput(6);
+				if(xmit.getInputStatus() == 0)
+					hudMode = HUDMODE.OPS;
+				else
+					refreshInputElements();
+			}
+			break;
+		case SEVEN:
+			if(inputElements.get(ELEMENT.HUD_INP_SEV.getIndex()).isActive()){
+				xmit.setInput(7);
+				if(xmit.getInputStatus() == 0)
+					hudMode = HUDMODE.OPS;
+				else
+					refreshInputElements();
+			}
+			break;
+		case EIGHT:
+			if(inputElements.get(ELEMENT.HUD_INP_EIG.getIndex()).isActive()){
+				xmit.setInput(8);
+				if(xmit.getInputStatus() == 0)
+					hudMode = HUDMODE.OPS;
+				else
+					refreshInputElements();
+			}
+			break;
+		case NINE:
+			if(inputElements.get(ELEMENT.HUD_INP_NIN.getIndex()).isActive()){
+				xmit.setInput(9);
+				if(xmit.getInputStatus() == 0)
 					hudMode = HUDMODE.OPS;
 				else
 					refreshInputElements();
@@ -243,14 +323,6 @@ public class Hud implements MouseMotionListener, MouseListener {
 			element.toggle();
 			toggleRuler();
 			break;
-		case SEVEN:
-			break;
-		case SIX:
-			break;
-		case THREE:
-			break;
-		case TWO:
-			break;
 		case XMIT:
 			if(selectedMobile.getOps(ELEMENT.HUD_OPS_XMT.getIndex())){
 				selectedMobile.call(xmit);
@@ -264,8 +336,6 @@ public class Hud implements MouseMotionListener, MouseListener {
 		case XZ:
 			hudPerspective = true;
 			element.setElementResponse(RESPONSE.XY);
-			break;
-		case ZER:
 			break;
 		default:
 			break;

@@ -12,14 +12,16 @@ public class Xmit {
 	private int headingInit;
 	private int mark;
 	private int markInit;
+	private int speed;
+	private int speedInit;
 	
-	private int speedInputStatus;
-	private int headingInputStatus;
+	private int inputStatus;
 	
 	private boolean[] opsAct = {false, false, false, false, false, false, false, false, false};
 	private boolean[] inputAvail = {false, false, false, false, false,
 									false, false, false, false, false,
 									false, false, false };
+	private boolean inputDest = false;		// false = heading, true = speed
 	private Static waypoint;
 	
 	/**
@@ -29,6 +31,10 @@ public class Xmit {
 	public Xmit(Mobile m){
 		headingInit = (int)m.getHdg();
 		markInit = (int)m.getMK();
+		speedInit = (int)m.getSpd();
+		heading = headingInit;
+		mark = markInit;
+		speed = speedInit;
 		for(int i = 0; i < opsAct.length; i++){
 			opsAct[i] = m.getOpsActive(i);
 		}
@@ -68,20 +74,28 @@ public class Xmit {
 		return opsAct[ELEMENT.HUD_OPS_APR.getIndex()];
 	}
 	
+	@Deprecated
 	public int getHdgStatus(){
-		return headingInputStatus;
+//		return headingInputStatus;
+		return inputStatus;
 	}
 	
+	@Deprecated
 	public int getSpdStatus(){
-		return speedInputStatus;
+//		return speedInputStatus;
+		return inputStatus;
+	}
+	
+	public int getInputStatus(){
+		return inputStatus;
 	}
 	
 	public Static getWaypoint(){
 		return waypoint;
 	}
 	
-	public void initHdg(){
-		headingInputStatus = 100;
+	private void initHdg(){
+		inputStatus = 100;
 		heading = headingInit;
 		mark = markInit;
 		for(int i = 0; i < inputAvail.length; i++){
@@ -95,49 +109,81 @@ public class Xmit {
 		inputAvail[ELEMENT.HUD_INP_MRK.getIndex()] = true;
 	}
 	
-	public void initSpd(){
-		
+	private void initSpd(){
+		inputStatus = 100;
+		speed = speedInit;
+		for(int i = 0; i < inputAvail.length; i++){
+			inputAvail[i] = false;
+		}
+		if(speedInit >= 100){
+			for(int i = ELEMENT.HUD_INP_ONE.getIndex(); i <= speedInit / 100; i++){
+				inputAvail[i] = true;
+			}
+		}
+		else{
+			for(int i = ELEMENT.HUD_INP_ONE.getIndex(); i <= speedInit / 100; i++){
+				inputAvail[i] = true;
+				inputStatus = 10;
+			}
+		}
+		inputAvail[ELEMENT.HUD_INP_ZER.getIndex()] = true;
+		inputAvail[ELEMENT.HUD_INP_CAN.getIndex()] = true;
 	}
 	
-	public void setHeading(int heading){
+	private void setHeading(int heading){
 		if(heading == -1){
-			if(headingInputStatus == 10) this.heading /= 100;
-			else if(headingInputStatus == 1) this.heading /= 10;
+			if(inputStatus == 10) this.heading /= 100;
+			else if(inputStatus == 1) this.heading /= 10;
 			else this.heading /= 1;
-			headingInputStatus = -100;
+			inputStatus = -100;
 			updateHdgInpStatus();
 			return;
 		}
-		switch(headingInputStatus){
+		switch(inputStatus){
 		case 100:
 			this.heading = heading * 100;
-			headingInputStatus = 10;
+			inputStatus = 10;
 			break;
 		case 10:
 			this.heading += (heading * 10);
-			headingInputStatus = 1;
+			inputStatus = 1;
 			break;
 		case 1:
 			this.heading += heading;
-			headingInputStatus = -100;
+			inputStatus = -100;
 			break;
 		case - 100:
 			this.mark = heading * 100;
-			headingInputStatus = -10;
+			inputStatus = -10;
 			break;
 		case -10:
 			this.mark += (heading * 10);
-			headingInputStatus = -1;
+			inputStatus = -1;
 			break;
 		case -1:
 			this.mark += heading;
-			headingInputStatus = 0;
+			inputStatus = 0;
 			break;
 		}
 		System.out.println("Current Hdg Entry: " + this.heading + "." + this.mark);
 		updateHdgInpStatus();
 	}
 	
+	public void setInput(int input){
+		if(inputDest){
+			setSpeed(input);
+			updateSpdInpStatus();
+		}
+		else{
+			setHeading(input);
+			updateHdgInpStatus();
+		}
+	}
+	
+	private void setSpeed(int speed){
+	}
+	
+	@Deprecated
 	public void setMark(int mark){
 		this.mark = mark;
 	}
@@ -154,6 +200,20 @@ public class Xmit {
 		opsAct[ELEMENT.HUD_OPS_APR.getIndex()] = status;
 	}
 	
+	/**
+	 * Sets the destination for input.<br>
+	 * false = heading<br>
+	 * true = speed<br>
+	 * @param category destination for input
+	 */
+	public void setDest(boolean dest){
+		inputDest = dest;
+		if(inputDest)
+			initSpd();
+		else
+			initHdg();
+	}
+	
 	public void setWaypoint(Static waypoint){
 		this.waypoint = waypoint;
 	}
@@ -162,7 +222,7 @@ public class Xmit {
 	 * Updates the available options for heading input to be displayed on the hud.
 	 */
 	private void updateHdgInpStatus(){
-		switch(headingInputStatus){
+		switch(inputStatus){
 		case 10:
 			inputAvail[ELEMENT.HUD_INP_FOU.getIndex()] = true;
 			inputAvail[ELEMENT.HUD_INP_FIV.getIndex()] = true;
@@ -196,6 +256,10 @@ public class Xmit {
 		case -1:
 			break;
 		}
+	}
+	
+	private void updateSpdInpStatus(){
+		
 	}
 	
 }

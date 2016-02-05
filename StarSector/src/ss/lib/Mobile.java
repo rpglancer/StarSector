@@ -216,33 +216,33 @@ public class Mobile extends Entity{
 		if(recipTwo < 0) recipTwo += 360;
 		// Turn left
 		if(recipOne <= recipTwo){
-			if(calcDegOffset(hdgCurrent, hdgDesired) < turnRateMax)
+			if(calcDegOffset(hdgCurrent, hdgDesired) < turnRateMax * StarSector.SweepLength)
 				hdgCurrent -= calcDegOffset(hdgCurrent, hdgDesired);
 			else
-				hdgCurrent -= turnRateMax;
+				hdgCurrent -= turnRateMax * StarSector.SweepLength;
 			if(hdgCurrent < 0) hdgCurrent += 360;
 		}
 		// Turn right
 		else{
-			if(calcDegOffset(hdgCurrent, hdgDesired) < turnRateMax)
+			if(calcDegOffset(hdgCurrent, hdgDesired) < turnRateMax * StarSector.SweepLength)
 				hdgCurrent += calcDegOffset(hdgCurrent, hdgDesired);
 			else
-				hdgCurrent += turnRateMax;
+				hdgCurrent += turnRateMax * StarSector.SweepLength;
 			if(hdgCurrent >= 360) hdgCurrent -= 360;
 		}
 		// Adjust Mk
 		if(mkCurrent != mkDesired){
 			if(mkCurrent > mkDesired){
-				if(calcDegOffset(mkCurrent, mkDesired) < turnRateMax)
+				if(calcDegOffset(mkCurrent, mkDesired) < turnRateMax * StarSector.SweepLength)
 					mkCurrent -= calcDegOffset(mkCurrent, mkDesired);
 				else
-					mkCurrent -= turnRateMax;
+					mkCurrent -= turnRateMax * StarSector.SweepLength;
 			}
 			else{
-				if(calcDegOffset(mkCurrent, mkDesired) < turnRateMax)
+				if(calcDegOffset(mkCurrent, mkDesired) < turnRateMax * StarSector.SweepLength)
 					mkCurrent += calcDegOffset(mkCurrent, mkDesired);
 				else
-					mkCurrent += turnRateMax;
+					mkCurrent += turnRateMax * StarSector.SweepLength;
 			}
 		}
 		System.out.println("DEBUG: " + hdgCurrent + "." + mkCurrent);
