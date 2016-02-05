@@ -49,7 +49,6 @@ public class Static extends Entity {
 	public void render(Graphics g, boolean p){
 		if(p) Draw.sprite_centered(g, StarSector.Sprites.grabImage(type.getSpriteC(), type.getSpriteR(), 16, 16), this.loc.GetX(), this.loc.GetY());
 		else Draw.sprite_centered(g, StarSector.Sprites.grabImage(type.getSpriteC(), type.getSpriteR(), 16, 16), this.loc.GetX(), this.loc.GetZ());
-//		Draw.circle_centered(g, loc, (int)(30 * StarSector.PPKM), Color.pink, p);
 	}
 
 	@Override

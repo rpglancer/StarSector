@@ -9,7 +9,7 @@ import ss.type.RESPONSE;
 
 public class HudElement {
 	private static Hud elementHud;				//	The hud element manager
-	private boolean isActive = false;			//	Is this element active?
+	private boolean isActive = false;			//	Is this element available for interaction?
 	private boolean isBlinking = false;			//	Is this element blinking?
 	private int blinkRate = 0;					//	For managing the blink rate
 	private Rectangle elementArea;				//	This element's area
@@ -132,6 +132,7 @@ public class HudElement {
 		return isActive;
 	}
 	
+	@Deprecated
 	public void toggle(){
 		isActive = !isActive;
 	}

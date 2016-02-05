@@ -41,8 +41,17 @@ public class Hud implements MouseMotionListener, MouseListener {
 	
 	private SimpleDateFormat dateF = new SimpleDateFormat("HH:mm:ss zzz");
 	
+	/**
+	 * Vector containing all of the HudElements that comprise the Hud Overview
+	 */
 	private Vector<HudElement> ovwElements = new Vector<HudElement>();
+	/**
+	 * Vector containing all of the HudElements that comprise the numeric Hud input display.
+	 */
 	private Vector<HudElement> inputElements = new Vector<HudElement>();
+	/**
+	 * Vector containing all of the HudElements that comprise the Hud operations display.
+	 */
 	private Vector<HudElement> opsElements = new Vector<HudElement>();
 	private Vector<Integer> rulerElementsY = new Vector<Integer>();
 	private Vector<Integer> rulerElementsX = new Vector<Integer>();
@@ -192,7 +201,7 @@ public class Hud implements MouseMotionListener, MouseListener {
 			break;
 		case HDG:
 			if(selectedMobile.getOps(ELEMENT.HUD_OPS_HDG.getIndex())){
-				xmit.setDest(false);
+				xmit.setInputDest(false);
 				refreshInputElements();
 				hudMode = HUDMODE.INPUT;
 			}
@@ -214,7 +223,7 @@ public class Hud implements MouseMotionListener, MouseListener {
 			break;
 		case SPD:
 			if(selectedMobile.getOps(ELEMENT.HUD_OPS_SPD.getIndex())){
-				xmit.setDest(true);
+				xmit.setInputDest(true);
 				refreshInputElements();
 				hudMode = HUDMODE.INPUT;
 			}
@@ -354,6 +363,9 @@ public class Hud implements MouseMotionListener, MouseListener {
 		}
 	}
 	
+	/**
+	 * Updates the availability of {@link Hud#inputElements} based upon the status of the current pending transmission.
+	 */
 	private void refreshInputElements(){
 		for(int i = 1; i < inputElements.size(); i++){
 			inputElements.get(i).setActive(xmit.getInputAvail(i));
@@ -479,6 +491,14 @@ public class Hud implements MouseMotionListener, MouseListener {
 			G.drawLine(rulerElementsX.get(i), StarSector.HEIGHT - 16, rulerElementsX.get(i), StarSector.HEIGHT - 12);
 			double offset = fm.stringWidth("" + (int)(rulerElementsX.get(i) / StarSector.PPKM));
 			G.drawString("" + (int)(rulerElementsX.get(i) / StarSector.PPKM), (int)(rulerElementsX.get(i) - (offset/2)), StarSector.HEIGHT - 4);
+		}
+		if(selectedMobile != null){
+			G.setColor(Color.cyan);
+			if(hudPerspective)
+				G.drawLine(16, (int)selectedMobile.getLoc().GetY(), 20, (int)selectedMobile.getLoc().GetY());
+			else
+				G.drawLine(16, (int)selectedMobile.getLoc().GetZ(), 20, (int)selectedMobile.getLoc().GetZ());
+			G.drawLine((int)selectedMobile.getLoc().GetX(), StarSector.HEIGHT - 16, (int)selectedMobile.getLoc().GetX(), StarSector.HEIGHT - 20);
 		}
 		G.setColor(prevC);
 		G.setFont(prevF);

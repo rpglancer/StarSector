@@ -21,7 +21,12 @@ public class Xmit {
 	private boolean[] inputAvail = {false, false, false, false, false,
 									false, false, false, false, false,
 									false, false, false };
-	private boolean inputDest = false;		// false = heading, true = speed
+	/**
+	 * The destination for numeric input to be applied.<br>
+	 * <b>true</b>: speed<br>
+	 * <b>false</b>: heading<br>
+	 */
+	private boolean inputDest = false;
 	private Static waypoint;
 	
 	/**
@@ -98,15 +103,7 @@ public class Xmit {
 		inputStatus = 100;
 		heading = headingInit;
 		mark = markInit;
-		for(int i = 0; i < inputAvail.length; i++){
-			inputAvail[i] = false;
-		}
-		for(int i = ELEMENT.HUD_INP_ONE.getIndex(); i < ELEMENT.HUD_INP_FOU.getIndex(); i++){
-			inputAvail[i] = true;
-		}
-		inputAvail[ELEMENT.HUD_INP_ZER.getIndex()] = true;
-		inputAvail[ELEMENT.HUD_INP_CAN.getIndex()] = true;
-		inputAvail[ELEMENT.HUD_INP_MRK.getIndex()] = true;
+		updateInpStatus();
 	}
 	
 	private void initSpd(){
@@ -115,77 +112,326 @@ public class Xmit {
 		for(int i = 0; i < inputAvail.length; i++){
 			inputAvail[i] = false;
 		}
-		if(speedInit >= 100){
-			for(int i = ELEMENT.HUD_INP_ONE.getIndex(); i <= speedInit / 100; i++){
-				inputAvail[i] = true;
-			}
-		}
-		else{
-			for(int i = ELEMENT.HUD_INP_ONE.getIndex(); i <= speedInit / 100; i++){
-				inputAvail[i] = true;
-				inputStatus = 10;
-			}
-		}
 		inputAvail[ELEMENT.HUD_INP_ZER.getIndex()] = true;
 		inputAvail[ELEMENT.HUD_INP_CAN.getIndex()] = true;
 	}
 	
 	private void setHeading(int heading){
-		if(heading == -1){
-			if(inputStatus == 10) this.heading /= 100;
-			else if(inputStatus == 1) this.heading /= 10;
-			else this.heading /= 1;
-			inputStatus = -100;
-			updateHdgInpStatus();
-			return;
-		}
-		switch(inputStatus){
-		case 100:
-			this.heading = heading * 100;
-			inputStatus = 10;
+		switch(heading){
+		case -1:
+			if(inputStatus == 100){
+				this.heading = headingInit;
+				inputStatus = -100;
+			}
+			else if(inputStatus == 10){
+				if(this.heading >= 100)
+					this.heading /= 100;
+				else
+					this.heading /= 10;
+				inputStatus = -100;
+			}
+			else if(inputStatus == 1){
+				this.heading /= 10;
+				inputStatus = -100;
+			}
 			break;
-		case 10:
-			this.heading += (heading * 10);
-			inputStatus = 1;
+		case 0:
+			if(inputStatus == 100){
+				this.heading = heading;
+				inputStatus = 10;
+			}
+			else if(inputStatus == 10){
+				this.heading += heading;
+				inputStatus = 1;
+			}
+			else if(inputStatus == 1){
+				this.heading += heading;
+				inputStatus = -100;
+			}
+			else if(inputStatus == -100){
+				this.mark = heading;
+				inputStatus = -10;
+			}
+			else if(inputStatus == -10){
+				this.mark += heading;
+				inputStatus = -1;
+			}
+			else if(inputStatus == -1){
+				this.mark += heading;
+				inputStatus = 0;
+			}
 			break;
 		case 1:
-			this.heading += heading;
-			inputStatus = -100;
+			if(inputStatus == 100){
+				this.heading = heading * 100;
+				inputStatus = 10;
+			}
+			else if(inputStatus == 10){
+				this.heading += (heading * 10);
+				inputStatus = 1;
+			}
+			else if(inputStatus == 1){
+				this.heading += heading;
+				inputStatus = -100;
+			}
+			else if(inputStatus == -100){
+				this.mark = heading * 100;
+				inputStatus = -10;
+			}
+			else if(inputStatus == -10){
+				this.mark += heading * 10;
+				inputStatus = -1;
+			}
+			else if(inputStatus == -1){
+				this.mark += heading;
+				inputStatus = 0;
+			}
 			break;
-		case - 100:
-			this.mark = heading * 100;
-			inputStatus = -10;
+		case 2:
+			if(inputStatus == 100){
+				this.heading = heading * 100;
+				inputStatus = 10;
+			}
+			else if(inputStatus == 10){
+				this.heading += heading * 10;
+				inputStatus = 1;
+			}
+			else if(inputStatus == 1){
+				this.heading += heading;
+				inputStatus = -100;
+			}
+			else if(inputStatus == -100){
+				this.mark = 0;
+				this.mark += heading * 10;
+				inputStatus = -1;
+			}
+			else if(inputStatus == -10){
+				this.mark += heading * 10;
+				inputStatus = -1;
+			}
+			else if(inputStatus == -1){
+				this.mark +=  heading;
+				inputStatus = 0;
+			}
 			break;
-		case -10:
-			this.mark += (heading * 10);
-			inputStatus = -1;
+		case 3:
+			if(inputStatus == 100){
+				this.heading = heading * 100;
+				inputStatus = 10;
+			}
+			else if(inputStatus == 10){
+				this.heading += heading * 10;
+				inputStatus = 1;
+			}
+			else if(inputStatus == 1){
+				this.heading += heading;
+				inputStatus = -100;
+			}
+			else if(inputStatus == -100){
+				this.mark = 0;
+				this.mark += heading * 10;
+				inputStatus = -1;
+			}
+			else if(inputStatus == -10){
+				this.mark += heading * 10;
+				inputStatus = -1;
+			}
+			else if(inputStatus == -1){
+				this.mark += heading;
+				inputStatus = 0;
+			}
 			break;
-		case -1:
-			this.mark += heading;
-			inputStatus = 0;
+		case 4:
+			if(inputStatus == 100){
+				this.heading = 0;
+				this.heading += heading * 10;
+				inputStatus = 1;
+			}
+			else if(inputStatus == 10){
+				this.heading += heading * 10;
+				inputStatus = 1;
+			}
+			else if(inputStatus == 1){
+				this.heading += heading;
+				inputStatus = -100;
+			}
+			else if(inputStatus == -100){
+				this.mark = 0;
+				this.mark += heading * 10;
+				inputStatus = -1;
+			}
+			else if(inputStatus == -10){
+				this.mark += heading * 10;
+				inputStatus = -1;
+			}
+			else if(inputStatus == -1){
+				this.mark += heading;
+				inputStatus = 0;
+			}
 			break;
+		case 5:
+			if(inputStatus == 100){
+				this.heading = 0;
+				this.heading += heading * 10;
+				inputStatus = 1;
+			}
+			else if(inputStatus == 10){
+				this.heading += heading * 10;
+				inputStatus = 1;
+			}
+			else if(inputStatus == 1){
+				this.heading += heading;
+				inputStatus = -100;
+			}
+			else if(inputStatus == -100){
+				this.mark = 0;
+				this.mark += heading * 10;
+				inputStatus = -1;
+			}
+			else if(inputStatus == -10){
+				this.mark += heading * 10;
+				inputStatus = -1;
+			}
+			else if(inputStatus == -1){
+				this.mark += heading;
+				inputStatus = 0;
+			}
+			break;
+		case 6:
+			if(inputStatus == 100){
+				this.heading = 0;
+				this.heading += heading * 10;
+				inputStatus = 1;
+			}
+			else if(inputStatus == 10){
+				this.heading += heading * 10;
+				inputStatus = 1;
+			}
+			else if(inputStatus == 1){
+				this.heading += heading;
+				inputStatus = - 100;
+			}
+			else if(inputStatus == -100){
+				this.mark = 0;
+				this.mark += heading * 10;
+				inputStatus = -1;
+			}
+			else if(inputStatus == -10){
+				this.mark += heading * 10;
+				inputStatus = -1;
+			}
+			else if(inputStatus == -1){
+				this.mark += heading;
+				inputStatus = 0;
+			}
+			break;
+		case 7:
+			if(inputStatus == 100){
+				this.heading = 0;
+				this.heading += heading * 10;
+				inputStatus = 1;
+			}
+			else if(inputStatus == 10){
+				this.heading += heading * 10;
+				inputStatus = 1;
+			}
+			else if(inputStatus == 1){
+				this.heading += heading;
+				inputStatus = -100;
+			}
+			else if(inputStatus == -100){
+				this.mark = 0;
+				this.mark += heading * 10;
+				inputStatus = -1;
+			}
+			else if(inputStatus == -10){
+				this.mark += heading * 10;
+				inputStatus = -1;
+			}
+			else if(inputStatus == -1){
+				this.mark += heading * 1;
+				inputStatus = 0;
+			}
+			break;
+		case 8:
+			if(inputStatus == 100){
+				this.heading = 0;
+				this.heading += heading * 10;
+				inputStatus = 1;
+			}
+			else if(inputStatus == 10){
+				this.heading += heading * 10;
+				inputStatus = 1;
+			}
+			else if(inputStatus == 1){
+				this.heading += heading;
+				inputStatus = -100;
+			}
+			else if(inputStatus == -100){
+				this.mark = 0;
+				this.mark += heading * 10;
+				inputStatus = -1;
+			}
+			else if(inputStatus == -10){
+				this.mark += heading * 10;
+				inputStatus = -1;
+			}
+			else if(inputStatus == -1){
+				this.mark += heading;
+				inputStatus = 0;
+			}
+			break;
+		case 9:
+			if(inputStatus == 100){
+				this.heading = 0;
+				this.heading += heading * 10;
+				inputStatus = 1;
+			}
+			else if(inputStatus == 10){
+				this.heading += heading * 10;
+				inputStatus = 1;
+			}
+			else if(inputStatus == 1){
+				this.heading += heading;
+				inputStatus = -100;
+			}
+			else if(inputStatus == -100){
+				this.mark = 0;
+				this.mark += heading * 10;
+				inputStatus = -1;
+			}
+			else if(inputStatus == -10){
+				this.mark += heading * 10;
+				inputStatus = -1;
+			}
+			else if(inputStatus == -1){
+				this.mark += heading;
+				inputStatus = 0;
+			}
+			break;
+		default:
+			break;		
 		}
-		System.out.println("Current Hdg Entry: " + this.heading + "." + this.mark);
-		updateHdgInpStatus();
-	}
-	
-	public void processInput(int input){
-		if(inputDest){
-			setSpeed(input);
-			updateSpdInpStatus();
-		}
-		else{
-			setHeading(input);
-			updateHdgInpStatus();
-		}
-	}
-	
-	private void setSpeed(int speed){
+		System.out.println("Processed Input: " + this.heading + "." + this.mark);
 	}
 	
 	@Deprecated
-	public void setMark(int mark){
-		this.mark = mark;
+	/*
+	 * This is going to be replaced with a unified method for processing input; 
+	 * most likely an overhauled and renamed setHeading-like method.
+	 */
+	public void processInput(int input){
+		if(inputDest){
+			setSpeed(input);
+		}
+		else{
+			setHeading(input);
+		}
+		updateInpStatus();
+	}
+
+	@Deprecated
+	private void setSpeed(int speed){
 	}
 	
 	public void setHold(boolean status){
@@ -206,7 +452,7 @@ public class Xmit {
 	 * true = speed<br>
 	 * @param category destination for input
 	 */
-	public void setDest(boolean dest){
+	public void setInputDest(boolean dest){
 		inputDest = dest;
 		if(inputDest)
 			initSpd();
@@ -218,48 +464,62 @@ public class Xmit {
 		this.waypoint = waypoint;
 	}
 	
-	/**
-	 * Updates the available options for heading input to be displayed on the hud.
-	 */
-	private void updateHdgInpStatus(){
+	private void updateInpStatus(){
 		switch(inputStatus){
+		case 100:
+			for(int i = 1; i < inputAvail.length; i++){
+				inputAvail[i] = true;
+			}
+			break;
 		case 10:
-			inputAvail[ELEMENT.HUD_INP_FOU.getIndex()] = true;
-			inputAvail[ELEMENT.HUD_INP_FIV.getIndex()] = true;
-			inputAvail[ELEMENT.HUD_INP_SIX.getIndex()] = true;
-			if(heading < 300){
-				inputAvail[ELEMENT.HUD_INP_SEV.getIndex()] = true;
-				inputAvail[ELEMENT.HUD_INP_EIG.getIndex()] = true;
-				inputAvail[ELEMENT.HUD_INP_NIN.getIndex()] = true;
+			if(inputDest){
+				
+			}
+			else{
+				if(this.heading >= 300){
+					for(int i = 7; i < 10; i++){
+						inputAvail[i] = false;
+					}
+				}
 			}
 			break;
 		case 1:
+			if(inputDest){
+				
+			}
+			else{
+				if(this.heading >= 360){
+					for(int i = 1; i < 10; i++){
+						inputAvail[i] = false;
+					}
+				}
+				else{
+					for(int i = 1; i < 10; i++){
+						inputAvail[i] = true;
+					}
+				}
+			}
 			break;
 		case -100:
 			for(int i = 1; i < inputAvail.length; i++){
-				inputAvail[i] = false;
+				inputAvail[i] = true;
 			}
-			inputAvail[ELEMENT.HUD_INP_ONE.getIndex()] = true;
-			inputAvail[ELEMENT.HUD_INP_ZER.getIndex()] = true;
-			inputAvail[ELEMENT.HUD_INP_CAN.getIndex()] = true;
+			inputAvail[ELEMENT.HUD_INP_MRK.getIndex()] = false;
 			break;
 		case -10:
-			inputAvail[ELEMENT.HUD_INP_TWO.getIndex()] = true;
-			inputAvail[ELEMENT.HUD_INP_THR.getIndex()] = true;
-			inputAvail[ELEMENT.HUD_INP_FOU.getIndex()] = true;
-			inputAvail[ELEMENT.HUD_INP_FIV.getIndex()] = true;
-			inputAvail[ELEMENT.HUD_INP_SIX.getIndex()] = true;
-			inputAvail[ELEMENT.HUD_INP_SEV.getIndex()] = true;
-			inputAvail[ELEMENT.HUD_INP_EIG.getIndex()] = true;
-			if(mark < 1) inputAvail[ELEMENT.HUD_INP_NIN.getIndex()] = true;
+			if(this.mark >= 100){
+				inputAvail[ELEMENT.HUD_INP_NIN.getIndex()] = false;
+			}
 			break;
 		case -1:
+			inputAvail[ELEMENT.HUD_INP_NIN.getIndex()] = true;
+			if(this.mark >= 180){
+				for(int i = 1; i < 10; i++){
+					inputAvail[i] = false;
+				}
+			}
 			break;
 		}
-	}
-	
-	private void updateSpdInpStatus(){
-		
 	}
 	
 }

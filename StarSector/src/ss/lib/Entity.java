@@ -3,6 +3,11 @@ package ss.lib;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 
+/**
+ * Anything and everything that walketh, crawleth, crasheth or flyeth in this game.
+ * @author Matt Bangert
+ *
+ */
 public abstract class Entity {
 	protected Coords loc;
 	

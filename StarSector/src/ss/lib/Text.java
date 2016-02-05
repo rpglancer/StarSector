@@ -95,7 +95,15 @@ public class Text {
 			alignText(g, f, r.x, y, r.width, h, current);
 		}
 	}
-	
+
+	/**
+	 * For the love of god, do not use this.
+	 * @param g	Graphics to manipulate
+	 * @param f	Font to use
+	 * @param x	X coordinate[anchor?]
+	 * @param y Y coordinate[anchor?]
+	 * @param text Text string to rotate.
+	 */
 	public static void RotateText(Graphics g, Font f, int x, int y, String text){
 		Font prevF = g.getFont();
 		g.setFont(f);
