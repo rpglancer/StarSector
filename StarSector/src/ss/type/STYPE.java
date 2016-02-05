@@ -1,9 +1,19 @@
 package ss.type;
 
-// Type, Sprite row, Sprite Column
+/**
+ * Static Types.<br>
+ * An enumerator which contains [most] of the relevant data for Static Entities.<br>
+ * <b>EnumID</b><br>
+ * <b>(String)</b>TypeName<br>
+ * <b>(int)</b>SpriteRow<br>
+ * <b>(int)</b>SpriteColumn
+ * @author Matt Bangert
+ *
+ */
 public enum STYPE {
-	FIX ("Fix", 0, 0),
-	GATE ("Gate", 0, 0),
+//	enumID	Name	   sR  sC
+	FIX 	("Fix", 	0, 0),
+	GATE 	("Gate", 	0, 0),
 	STATION ("Station", 1, 1);
 	
 	private String type;

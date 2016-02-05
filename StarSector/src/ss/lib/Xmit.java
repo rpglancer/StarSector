@@ -169,7 +169,7 @@ public class Xmit {
 		updateHdgInpStatus();
 	}
 	
-	public void setInput(int input){
+	public void processInput(int input){
 		if(inputDest){
 			setSpeed(input);
 			updateSpdInpStatus();
