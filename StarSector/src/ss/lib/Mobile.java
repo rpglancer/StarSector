@@ -27,6 +27,7 @@ public class Mobile extends Entity{
 	
 	private double accelMax			= 0;			// The maximum acceleration rate of the Mobile [in m/s]
 	private double speedCurrent		= 0;			// The current speed of the Mobile [in m/s]
+	private double speedDesired		= 0;			// The desired speed of the Mobile [in m/s]
 	private double speedMax			= 0;			// The maximum speed of the Mobile [in m/s]
 	private double turnRateMax		= 5;			// The maximum turn rate of the Mobile [in deg/sec]
 	
@@ -84,6 +85,7 @@ public class Mobile extends Entity{
 		mkDesired = mkCurrent;
 		accelMax = 5;
 		speedCurrent = 150;
+		speedDesired = speedCurrent;
 		speedMax = 150;
 		this.dir = Calc.dVector(this, Hud.getTimeProject());
 		Tracon.addMobile(this);
@@ -122,6 +124,7 @@ public class Mobile extends Entity{
 	@Override
 	public void tick(){
 		updateHistory();
+		throttle();
 		if(hdgCurrent != hdgDesired || mkCurrent != mkDesired){
 			turn();
 		}
@@ -132,6 +135,7 @@ public class Mobile extends Entity{
 	public void call(Xmit xmit){
 		hdgDesired = xmit.getHeading();
 		mkDesired = xmit.getMark();
+		speedDesired = xmit.getSpd();
 		for(int i = 0; i < mobOpsAct.length; i++){
 			mobOpsAct[i] = xmit.getOpsActive(i);
 		}
@@ -229,6 +233,28 @@ public class Mobile extends Entity{
 		if(des <= 180) d = 0 + des;
 		else d = 360 - des;
 		return (Math.abs(c - d));
+	}
+	
+	private void throttle(){
+		if(speedCurrent == speedDesired) return;
+		else{
+			if(speedCurrent > speedDesired){
+				if(accelMax * StarSector.SweepLength > speedCurrent - speedDesired){
+					speedCurrent = speedDesired;
+				}
+				else{
+					speedCurrent -= accelMax * StarSector.SweepLength;
+				}
+			}
+			else{
+				if(accelMax * StarSector.SweepLength > speedDesired - speedCurrent){
+					speedCurrent = speedDesired;
+				}
+				else{
+					speedCurrent += accelMax * StarSector.SweepLength;
+				}
+			}
+		}
 	}
 	
 	private void turn(){

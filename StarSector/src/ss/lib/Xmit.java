@@ -14,10 +14,25 @@ public class Xmit {
 	private int markInit;
 	private int speed;
 	private int speedInit;
+	private int speedMax;
 	
+	/**
+	 * Tracks and manages the status of input submitted via the Hud input.<br>
+	 * <b>100:</b> Input is a 100s value<br>
+	 * <b>-100:</b> Input is a 100s value for mark<br>
+	 * <b>10:</b> Input is a 10s value<br>
+	 * <b>-10:</b> Input is a 10s value for mark<br>
+	 * <b>1:</b> Input is a 1s value<br>
+	 * <b>-1:</b> Input is a 1s value for mark<br>
+	 * <b>0:</b> The input process has been completed<br>
+	 */
 	private int inputStatus;
 	
 	private boolean[] opsAct = {false, false, false, false, false, false, false, false, false};
+	/**
+	 * Array for managing the availability of input HudElements as they pertain to the Mobile for
+	 * which this Xmit will apply.<br>
+	 */
 	private boolean[] inputAvail = {false, false, false, false, false,
 									false, false, false, false, false,
 									false, false, false };
@@ -37,6 +52,7 @@ public class Xmit {
 		headingInit = (int)m.getHdg();
 		markInit = (int)m.getMK();
 		speedInit = (int)m.getSpd();
+		speedMax = (int)m.getSpdMax();
 		heading = headingInit;
 		mark = markInit;
 		speed = speedInit;
@@ -50,12 +66,21 @@ public class Xmit {
 		return heading;
 	}
 	
-	public int getMark(){
-		return mark;
-	}
-	
+	/**
+	 * Allows the array of inputAvail to be queried by external methods [ie: the hud].
+	 * @param index The component of the inputAvail array to be queried.
+	 * @return The availability of the queried component.
+	 */
 	public boolean getInputAvail(int index){
 		return inputAvail[index];
+	}
+	
+	/**
+	 * Allows the current inputStatus to be queried by external methods [ie: the hud].
+	 * @return The current {@link Xmit#inputStatus}
+	 */
+	public int getInputStatus(){
+		return inputStatus;
 	}
 	
 	/**
@@ -67,385 +92,116 @@ public class Xmit {
 		return opsAct[index];
 	}
 	
-	public boolean getHold(){
-		return opsAct[ELEMENT.HUD_OPS_HLD.getIndex()];
+	public int getMark(){
+		return mark;
 	}
 	
-	public boolean getDirect(){
-		return opsAct[ELEMENT.HUD_OPS_DCT.getIndex()];
-	}
-	
-	public boolean getApproach(){
-		return opsAct[ELEMENT.HUD_OPS_APR.getIndex()];
-	}
-	
-	@Deprecated
-	public int getHdgStatus(){
-//		return headingInputStatus;
-		return inputStatus;
-	}
-	
-	@Deprecated
-	public int getSpdStatus(){
-//		return speedInputStatus;
-		return inputStatus;
-	}
-	
-	public int getInputStatus(){
-		return inputStatus;
+	public int getSpd(){
+		return speed;
 	}
 	
 	public Static getWaypoint(){
 		return waypoint;
 	}
-	
-	private void initHdg(){
-		inputStatus = 100;
-		heading = headingInit;
-		mark = markInit;
-		updateInpStatus();
-	}
-	
-	private void initSpd(){
-		inputStatus = 100;
-		speed = speedInit;
-		for(int i = 0; i < inputAvail.length; i++){
-			inputAvail[i] = false;
+
+	public void process(int input){
+		if(input == -2){
+			if(inputDest)initSpd();
+			else initHdg();
+			updateInpStatus();
+			return;
 		}
-		inputAvail[ELEMENT.HUD_INP_ZER.getIndex()] = true;
-		inputAvail[ELEMENT.HUD_INP_CAN.getIndex()] = true;
-	}
-	
-	private void setHeading(int heading){
-		switch(heading){
-		case -1:
-			if(inputStatus == 100){
-				this.heading = headingInit;
-				inputStatus = -100;
-			}
-			else if(inputStatus == 10){
-				if(this.heading >= 100)
-					this.heading /= 100;
-				else
-					this.heading /= 10;
-				inputStatus = -100;
-			}
-			else if(inputStatus == 1){
-				this.heading /= 10;
-				inputStatus = -100;
-			}
-			break;
-		case 0:
-			if(inputStatus == 100){
-				this.heading = heading;
-				inputStatus = 10;
-			}
-			else if(inputStatus == 10){
-				this.heading += heading;
-				inputStatus = 1;
-			}
-			else if(inputStatus == 1){
-				this.heading += heading;
-				inputStatus = -100;
-			}
-			else if(inputStatus == -100){
-				this.mark = heading;
-				inputStatus = -10;
-			}
-			else if(inputStatus == -10){
-				this.mark += heading;
-				inputStatus = -1;
-			}
-			else if(inputStatus == -1){
-				this.mark += heading;
-				inputStatus = 0;
-			}
-			break;
-		case 1:
-			if(inputStatus == 100){
-				this.heading = heading * 100;
-				inputStatus = 10;
-			}
-			else if(inputStatus == 10){
-				this.heading += (heading * 10);
-				inputStatus = 1;
-			}
-			else if(inputStatus == 1){
-				this.heading += heading;
-				inputStatus = -100;
-			}
-			else if(inputStatus == -100){
-				this.mark = heading * 100;
-				inputStatus = -10;
-			}
-			else if(inputStatus == -10){
-				this.mark += heading * 10;
-				inputStatus = -1;
-			}
-			else if(inputStatus == -1){
-				this.mark += heading;
-				inputStatus = 0;
-			}
-			break;
-		case 2:
-			if(inputStatus == 100){
-				this.heading = heading * 100;
-				inputStatus = 10;
-			}
-			else if(inputStatus == 10){
-				this.heading += heading * 10;
-				inputStatus = 1;
-			}
-			else if(inputStatus == 1){
-				this.heading += heading;
-				inputStatus = -100;
-			}
-			else if(inputStatus == -100){
-				this.mark = 0;
-				this.mark += heading * 10;
-				inputStatus = -1;
-			}
-			else if(inputStatus == -10){
-				this.mark += heading * 10;
-				inputStatus = -1;
-			}
-			else if(inputStatus == -1){
-				this.mark +=  heading;
-				inputStatus = 0;
-			}
-			break;
-		case 3:
-			if(inputStatus == 100){
-				this.heading = heading * 100;
-				inputStatus = 10;
-			}
-			else if(inputStatus == 10){
-				this.heading += heading * 10;
-				inputStatus = 1;
-			}
-			else if(inputStatus == 1){
-				this.heading += heading;
-				inputStatus = -100;
-			}
-			else if(inputStatus == -100){
-				this.mark = 0;
-				this.mark += heading * 10;
-				inputStatus = -1;
-			}
-			else if(inputStatus == -10){
-				this.mark += heading * 10;
-				inputStatus = -1;
-			}
-			else if(inputStatus == -1){
-				this.mark += heading;
-				inputStatus = 0;
-			}
-			break;
-		case 4:
-			if(inputStatus == 100){
-				this.heading = 0;
-				this.heading += heading * 10;
-				inputStatus = 1;
-			}
-			else if(inputStatus == 10){
-				this.heading += heading * 10;
-				inputStatus = 1;
-			}
-			else if(inputStatus == 1){
-				this.heading += heading;
-				inputStatus = -100;
-			}
-			else if(inputStatus == -100){
-				this.mark = 0;
-				this.mark += heading * 10;
-				inputStatus = -1;
-			}
-			else if(inputStatus == -10){
-				this.mark += heading * 10;
-				inputStatus = -1;
-			}
-			else if(inputStatus == -1){
-				this.mark += heading;
-				inputStatus = 0;
-			}
-			break;
-		case 5:
-			if(inputStatus == 100){
-				this.heading = 0;
-				this.heading += heading * 10;
-				inputStatus = 1;
-			}
-			else if(inputStatus == 10){
-				this.heading += heading * 10;
-				inputStatus = 1;
-			}
-			else if(inputStatus == 1){
-				this.heading += heading;
-				inputStatus = -100;
-			}
-			else if(inputStatus == -100){
-				this.mark = 0;
-				this.mark += heading * 10;
-				inputStatus = -1;
-			}
-			else if(inputStatus == -10){
-				this.mark += heading * 10;
-				inputStatus = -1;
-			}
-			else if(inputStatus == -1){
-				this.mark += heading;
-				inputStatus = 0;
-			}
-			break;
-		case 6:
-			if(inputStatus == 100){
-				this.heading = 0;
-				this.heading += heading * 10;
-				inputStatus = 1;
-			}
-			else if(inputStatus == 10){
-				this.heading += heading * 10;
-				inputStatus = 1;
-			}
-			else if(inputStatus == 1){
-				this.heading += heading;
-				inputStatus = - 100;
-			}
-			else if(inputStatus == -100){
-				this.mark = 0;
-				this.mark += heading * 10;
-				inputStatus = -1;
-			}
-			else if(inputStatus == -10){
-				this.mark += heading * 10;
-				inputStatus = -1;
-			}
-			else if(inputStatus == -1){
-				this.mark += heading;
-				inputStatus = 0;
-			}
-			break;
-		case 7:
-			if(inputStatus == 100){
-				this.heading = 0;
-				this.heading += heading * 10;
-				inputStatus = 1;
-			}
-			else if(inputStatus == 10){
-				this.heading += heading * 10;
-				inputStatus = 1;
-			}
-			else if(inputStatus == 1){
-				this.heading += heading;
-				inputStatus = -100;
-			}
-			else if(inputStatus == -100){
-				this.mark = 0;
-				this.mark += heading * 10;
-				inputStatus = -1;
-			}
-			else if(inputStatus == -10){
-				this.mark += heading * 10;
-				inputStatus = -1;
-			}
-			else if(inputStatus == -1){
-				this.mark += heading * 1;
-				inputStatus = 0;
-			}
-			break;
-		case 8:
-			if(inputStatus == 100){
-				this.heading = 0;
-				this.heading += heading * 10;
-				inputStatus = 1;
-			}
-			else if(inputStatus == 10){
-				this.heading += heading * 10;
-				inputStatus = 1;
-			}
-			else if(inputStatus == 1){
-				this.heading += heading;
-				inputStatus = -100;
-			}
-			else if(inputStatus == -100){
-				this.mark = 0;
-				this.mark += heading * 10;
-				inputStatus = -1;
-			}
-			else if(inputStatus == -10){
-				this.mark += heading * 10;
-				inputStatus = -1;
-			}
-			else if(inputStatus == -1){
-				this.mark += heading;
-				inputStatus = 0;
-			}
-			break;
-		case 9:
-			if(inputStatus == 100){
-				this.heading = 0;
-				this.heading += heading * 10;
-				inputStatus = 1;
-			}
-			else if(inputStatus == 10){
-				this.heading += heading * 10;
-				inputStatus = 1;
-			}
-			else if(inputStatus == 1){
-				this.heading += heading;
-				inputStatus = -100;
-			}
-			else if(inputStatus == -100){
-				this.mark = 0;
-				this.mark += heading * 10;
-				inputStatus = -1;
-			}
-			else if(inputStatus == -10){
-				this.mark += heading * 10;
-				inputStatus = -1;
-			}
-			else if(inputStatus == -1){
-				this.mark += heading;
-				inputStatus = 0;
-			}
-			break;
-		default:
-			break;		
-		}
-		System.out.println("Processed Input: " + this.heading + "." + this.mark);
-	}
-	
-	@Deprecated
-	/*
-	 * This is going to be replaced with a unified method for processing input; 
-	 * most likely an overhauled and renamed setHeading-like method.
-	 */
-	public void processInput(int input){
 		if(inputDest){
-			setSpeed(input);
+			switch(inputStatus){
+			case 100:
+				if(input > speedMax / 100){
+					this.speed = 0;
+					if(input > speedMax / 10){
+						this.speed += input;
+						inputStatus = 0;
+					}
+					else{
+						this.speed += input * 10;
+						inputStatus = 1;
+					}
+				}
+				else{
+					this.speed = input * 100;
+					inputStatus = 10;
+				}
+				break;
+			case 10:
+				this.speed += input * 10;
+				inputStatus = 1;
+				break;
+			case 1:
+				this.speed += input;
+				inputStatus = 0;
+				break;
+			}
 		}
 		else{
-			setHeading(input);
+			switch(inputStatus){
+			case 100:
+				if(input >= 0 && input <= 3){
+					this.heading = input * 100;
+					inputStatus = 10;
+				}
+				else if(input != -1){
+					this.heading = 0;
+					this.heading += input * 10;
+					inputStatus = 1;
+				}
+				else{
+					this.heading = headingInit;
+					inputStatus = -100;
+				}
+				break;
+			case 10:
+				if(input != -1){
+					this.heading += input * 10;
+					inputStatus = 1;	
+				}
+				else{
+					this.heading /= 100;
+					inputStatus = -100;
+				}
+				break;
+			case 1:
+				if(input != -1){
+					this.heading += input;
+					inputStatus = -100;
+				}
+				else{
+					this.heading /= 10;
+					inputStatus = -100;
+				}
+				break;
+			case -100:
+				if(input >= 0 && input <= 1){
+					this.mark = input * 100;
+					inputStatus = -10;
+				}
+				else{
+					this.mark = 0;
+					this.mark += input * 10;
+					inputStatus = -1;
+				}
+				break;
+			case -10:
+				this.mark += input * 10;
+				inputStatus = -1;
+				break;
+			case -1:
+				this.mark += input;
+				inputStatus = 0;
+			}
 		}
 		updateInpStatus();
+		if(inputDest)System.out.println("Speed: " + this.speed);
+		else System.out.println("Heading: " + this.heading + "." + this.mark);
 	}
 
-	@Deprecated
-	private void setSpeed(int speed){
-	}
-	
-	public void setHold(boolean status){
-		opsAct[ELEMENT.HUD_OPS_HLD.getIndex()] = status;
-	}
-	
-	public void setDirect(boolean status){
-		opsAct[ELEMENT.HUD_OPS_DCT.getIndex()] = status;
-	}
-	
-	public void setApproach(boolean status){
-		opsAct[ELEMENT.HUD_OPS_APR.getIndex()] = status;
-	}
-	
 	/**
 	 * Sets the destination for input.<br>
 	 * false = heading<br>
@@ -462,6 +218,29 @@ public class Xmit {
 	
 	public void setWaypoint(Static waypoint){
 		this.waypoint = waypoint;
+	}
+	
+	private void initHdg(){
+		inputStatus = 100;
+		heading = headingInit;
+		mark = markInit;
+		updateInpStatus();
+	}
+	
+	private void initSpd(){
+		inputStatus = 100;
+		speed = speedInit;
+		updateInpStatus();
+	}
+		
+	public void setOpsActive(int index, boolean status){
+		if(index > opsAct.length - 1){
+			System.out.println("WARN: Index out of bounds for Xmit.setOpsActive.");
+			return;
+		}
+		else{
+			opsAct[index] = status;
+		}
 	}
 	
 	private void updateInpStatus(){

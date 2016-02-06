@@ -27,9 +27,6 @@ import ss.type.RESPONSE;
  */
 public class Hud implements MouseMotionListener, MouseListener {
 	
-	@Deprecated
-	private Entity selectedEntity;
-
 	private Mobile selectedMobile;
 	
 	private static boolean hudPerspective = true;				// true = x/y, false = x/z
@@ -180,10 +177,11 @@ public class Hud implements MouseMotionListener, MouseListener {
 		switch(element.getElementResponse()){
 		case APRCLR:
 			if(selectedMobile.getOps(ELEMENT.HUD_OPS_APR.getIndex()))
-				xmit.setApproach(!xmit.getApproach());
+				xmit.setOpsActive(ELEMENT.HUD_OPS_APR.getIndex(), !xmit.getOpsActive(ELEMENT.HUD_OPS_APR.getIndex()));
 			break;
 		case CNCL:
 			if(inputElements.get(ELEMENT.HUD_INP_CAN.getIndex()).isActive()){
+				xmit.process(-2);
 				hudMode = HUDMODE.OPS;
 			}
 			break;
@@ -197,7 +195,7 @@ public class Hud implements MouseMotionListener, MouseListener {
 			break;
 		case DCT:
 			if(selectedMobile.getOps(ELEMENT.HUD_OPS_DCT.getIndex()))
-				xmit.setDirect(!xmit.getDirect());
+				xmit.setOpsActive(ELEMENT.HUD_OPS_DCT.getIndex(), !xmit.getOpsActive(ELEMENT.HUD_OPS_DCT.getIndex()));
 			break;
 		case HDG:
 			if(selectedMobile.getOps(ELEMENT.HUD_OPS_HDG.getIndex())){
@@ -208,11 +206,12 @@ public class Hud implements MouseMotionListener, MouseListener {
 			break;
 		case HOLD:
 			if(selectedMobile.getOps(ELEMENT.HUD_OPS_HLD.getIndex()))
-				xmit.setHold(!xmit.getHold());
+				xmit.setOpsActive(ELEMENT.HUD_OPS_HLD.getIndex(), !xmit.getOpsActive(ELEMENT.HUD_OPS_HLD.getIndex()));
 			break;
 		case MARK:
 			if(inputElements.get(ELEMENT.HUD_INP_MRK.getIndex()).isActive()){
-				xmit.processInput(-1);
+//				xmit.processInput(-1);
+				xmit.process(-1);
 				refreshInputElements();
 			}
 			break;
@@ -230,7 +229,7 @@ public class Hud implements MouseMotionListener, MouseListener {
 			break;
 		case ZER:
 			if(inputElements.get(ELEMENT.HUD_INP_ZER.getIndex()).isActive()){
-				xmit.processInput(0);
+				xmit.process(0);
 				if(xmit.getInputStatus() == 0)
 					hudMode = HUDMODE.OPS;
 				else
@@ -239,7 +238,7 @@ public class Hud implements MouseMotionListener, MouseListener {
 			break;
 		case ONE:
 			if(inputElements.get(ELEMENT.HUD_INP_ONE.getIndex()).isActive()){
-				xmit.processInput(1);
+				xmit.process(1);
 				if(xmit.getInputStatus() == 0)
 					hudMode = HUDMODE.OPS;
 				else
@@ -248,7 +247,7 @@ public class Hud implements MouseMotionListener, MouseListener {
 			break;
 		case TWO:
 			if(inputElements.get(ELEMENT.HUD_INP_TWO.getIndex()).isActive()){
-				xmit.processInput(2);
+				xmit.process(2);
 				if(xmit.getInputStatus() == 0)
 					hudMode = HUDMODE.OPS;
 				else
@@ -257,7 +256,7 @@ public class Hud implements MouseMotionListener, MouseListener {
 			break;
 		case THREE:
 			if(inputElements.get(ELEMENT.HUD_INP_THR.getIndex()).isActive()){
-				xmit.processInput(3);
+				xmit.process(3);
 				if(xmit.getInputStatus() == 0)
 					hudMode = HUDMODE.OPS;
 				else
@@ -266,7 +265,7 @@ public class Hud implements MouseMotionListener, MouseListener {
 			break;
 		case FOUR:
 			if(inputElements.get(ELEMENT.HUD_INP_FOU.getIndex()).isActive()){
-				xmit.processInput(4);
+				xmit.process(4);
 				if(xmit.getInputStatus() == 0)
 					hudMode = HUDMODE.OPS;
 				else
@@ -275,7 +274,7 @@ public class Hud implements MouseMotionListener, MouseListener {
 			break;
 		case FIVE:
 			if(inputElements.get(ELEMENT.HUD_INP_EIG.getIndex()).isActive()){
-				xmit.processInput(5);
+				xmit.process(5);
 				if(xmit.getInputStatus() == 0)
 					hudMode = HUDMODE.OPS;
 				else
@@ -284,7 +283,7 @@ public class Hud implements MouseMotionListener, MouseListener {
 			break;
 		case SIX:
 			if(inputElements.get(ELEMENT.HUD_INP_SIX.getIndex()).isActive()){
-				xmit.processInput(6);
+				xmit.process(6);
 				if(xmit.getInputStatus() == 0)
 					hudMode = HUDMODE.OPS;
 				else
@@ -293,7 +292,7 @@ public class Hud implements MouseMotionListener, MouseListener {
 			break;
 		case SEVEN:
 			if(inputElements.get(ELEMENT.HUD_INP_SEV.getIndex()).isActive()){
-				xmit.processInput(7);
+				xmit.process(7);
 				if(xmit.getInputStatus() == 0)
 					hudMode = HUDMODE.OPS;
 				else
@@ -302,7 +301,7 @@ public class Hud implements MouseMotionListener, MouseListener {
 			break;
 		case EIGHT:
 			if(inputElements.get(ELEMENT.HUD_INP_EIG.getIndex()).isActive()){
-				xmit.processInput(8);
+				xmit.process(8);
 				if(xmit.getInputStatus() == 0)
 					hudMode = HUDMODE.OPS;
 				else
@@ -311,7 +310,7 @@ public class Hud implements MouseMotionListener, MouseListener {
 			break;
 		case NINE:
 			if(inputElements.get(ELEMENT.HUD_INP_NIN.getIndex()).isActive()){
-				xmit.processInput(9);
+				xmit.process(9);
 				if(xmit.getInputStatus() == 0)
 					hudMode = HUDMODE.OPS;
 				else

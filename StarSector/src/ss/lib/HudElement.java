@@ -132,7 +132,6 @@ public class HudElement {
 		return isActive;
 	}
 	
-	@Deprecated
 	public void toggle(){
 		isActive = !isActive;
 	}
