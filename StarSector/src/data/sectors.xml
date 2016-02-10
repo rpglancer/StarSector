@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SS>
+	<Sector>
+		<Name>Terra Sector</Name>
+		<ID>001</ID>
+		<Req>0</Req>
+		<Contents>
+			<Static>
+				<Type>GATE</Type>
+				<Name>Luna</Name>
+				<X>110</X>
+				<Y>40</Y>
+				<Z>85</Z>
+			</Static>
+		</Contents>
+	</Sector>
+</SS>

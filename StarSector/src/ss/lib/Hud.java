@@ -32,7 +32,7 @@ public class Hud implements MouseMotionListener, MouseListener {
 	private static boolean hudPerspective = true;				// true = x/y, false = x/z
 	private static boolean drawRuler = false;
 	private static int hudTimeProjection = 1;					// The number of minutes calculated for course projection.
-	private HUDMODE hudMode = HUDMODE.OVERVIEW;
+	private HUDMODE hudMode = HUDMODE.MENU;
 	
 	private Xmit xmit;
 	
@@ -46,6 +46,7 @@ public class Hud implements MouseMotionListener, MouseListener {
 	 * Vector containing all of the HudElements that comprise the numeric Hud input display.
 	 */
 	private Vector<HudElement> inputElements = new Vector<HudElement>();
+	private Vector<HudElement> menuElements = new Vector<HudElement>();
 	/**
 	 * Vector containing all of the HudElements that comprise the Hud operations display.
 	 */
@@ -59,6 +60,9 @@ public class Hud implements MouseMotionListener, MouseListener {
 			switch(e.getMode()){
 			case INPUT:
 				inputElements.addElement(temp);
+				break;
+			case MENU:
+				menuElements.addElement(temp);
 				break;
 			case OPS:
 				opsElements.addElement(temp);
@@ -160,12 +164,27 @@ public class Hud implements MouseMotionListener, MouseListener {
 	// Render Base UI
 	// Render Contextual UI (if applicable)
 	public void Render(Graphics G){
-		Tracon.Render(G, hudPerspective);
-		renderBaseHud(G);
-		if(hudMode == HUDMODE.OPS)renderOps(G);
-		if(hudMode == HUDMODE.INPUT){
+		switch(hudMode){
+		case INPUT:
+			Tracon.Render(G, hudPerspective);
+			renderBaseHud(G);
 			renderOps(G);
 			renderInput(G);
+			break;
+		case MENU:
+			renderMainMenu(G);
+			break;
+		case OPS:
+			Tracon.Render(G, hudPerspective);
+			renderBaseHud(G);
+			renderOps(G);
+			break;
+		case OVERVIEW:
+			Tracon.Render(G, hudPerspective);
+			renderBaseHud(G);
+			break;
+		default:
+			break;
 		}
 	}
 	
@@ -422,6 +441,19 @@ public class Hud implements MouseMotionListener, MouseListener {
 			}
 		}
 		G2D.setColor(PrevC);
+	}
+	
+	private void renderMainMenu(Graphics G){
+		Color prevC = G.getColor();
+		Font prevF = G.getFont();
+		Graphics2D G2D = (Graphics2D)G;
+		for(int i = 0; i < menuElements.size(); i++){
+			G2D.setColor(Color.darkGray);
+			G2D.fill(menuElements.get(i).getElementArea());
+			G2D.setColor(Color.green);
+			G2D.draw(menuElements.get(i).getElementArea());
+			Text.BoxText(G, Fonts.RadarText, menuElements.get(i).getElementArea(), ALIGNH.CENTER, ALIGNV.MIDDLE, menuElements.get(i).getElementResponse().getText());
+		}
 	}
 	
 	private void renderOps(Graphics G){

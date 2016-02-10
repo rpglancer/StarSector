@@ -4,6 +4,9 @@ import java.awt.Color;
 
 //	EnumID	Text	ColorAvail	 ColorNotAvail
 public enum RESPONSE {
+	NEWG	("NEW",	Color.green, Color.red),
+	CONT	("CONTINUE", Color.green, Color.red),
+	MAPSEL	("\0", Color.green, Color.red),
 	NULL	("\0",	Color.black, Color.black),
 	ZER		("0",	Color.green, Color.darkGray),
 	ONE		("1",	Color.green, Color.darkGray),

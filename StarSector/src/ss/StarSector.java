@@ -81,7 +81,7 @@ public class StarSector extends Canvas implements Runnable{
 		
 		while(running){
 			long now = System.nanoTime();
-			now = System.nanoTime();
+//			now = System.nanoTime();
 			delta += (now - lastTime) / ns;
 			lastTime = now;
 			if(delta >= 1){
@@ -109,8 +109,8 @@ public class StarSector extends Canvas implements Runnable{
 			e.printStackTrace();
 		}
 		// Testing, feel free to remove.
-		Static Test = new Static(STYPE.STATION);
-		Mobile Mob = new Mobile(MTYPE.M5, Test, null);
+//		Static Test = new Static(STYPE.STATION);
+//		Mobile Mob = new Mobile(MTYPE.M5, Test, null);
 	}
 	
 	private void render(){

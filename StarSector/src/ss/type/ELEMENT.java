@@ -6,6 +6,8 @@ import ss.StarSector;
 //															Fill			Border
 //	EnumID			i	HUDMODE			RESPONSE			ColorAvail		ColorNotAvail	Coordinates
 public enum ELEMENT {
+	HUD_MNU_NEW		(0, HUDMODE.MENU,	RESPONSE.NEWG,		Color.darkGray,	Color.darkGray, StarSector.WIDTH / 2 - 64, StarSector.HEIGHT / 2, 128, 32),
+	HUD_MNU_CNT		(1, HUDMODE.MENU,	RESPONSE.CONT,		Color.darkGray,	Color.darkGray, StarSector.WIDTH / 2 - 64, StarSector.HEIGHT / 2 + 48, 128, 32),
 	HUD_OVW_RULER	(0, HUDMODE.OVERVIEW, RESPONSE.RULER,	Color.darkGray, Color.darkGray,	StarSector.WIDTH - 64, 0, 32, 16),
 	HUD_OVW_XYSWP	(1, HUDMODE.OVERVIEW, RESPONSE.XY, 		Color.darkGray, Color.darkGray,	StarSector.WIDTH - 32, 0, 32, 16),
 	HUD_OVW_CLOCK 	(2, HUDMODE.OVERVIEW, RESPONSE.CLOCK,	Color.darkGray, Color.darkGray,	0, 0, 80, 16),
