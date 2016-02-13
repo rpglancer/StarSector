@@ -12,9 +12,9 @@ package ss.type;
  */
 public enum STYPE {
 //	enumID	Name	   sR  sC
-	FIX 	("Fix", 	0, 0),
-	GATE 	("Gate", 	0, 0),
-	STATION ("Station", 1, 1);
+	FIX 	("Fix", 	2, 1),
+	GATE 	("Gate", 	2, 4),
+	STATION ("Station", 3, 1);
 	
 	private String type;
 	private int sR;
@@ -37,4 +37,5 @@ public enum STYPE {
 	public String getType(){
 		return type;
 	}
+	
 }

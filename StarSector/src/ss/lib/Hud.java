@@ -107,6 +107,14 @@ public class Hud implements MouseMotionListener, MouseListener {
 		switch(arg0.getButton()){
 		case MouseEvent.BUTTON1:
 			switch(hudMode){
+			case MENU:
+				for(int i = 0; i < menuElements.size(); i++){
+					if(menuElements.get(i).wasClicked(arg0.getX(), arg0.getY())){
+						hudProcess(menuElements.get(i));
+						break;
+					}
+				}
+				break;
 			case INPUT:
 				for(int i = 1; i < inputElements.size(); i++){
 					if(inputElements.get(i).wasClicked(arg0.getX(), arg0.getY())){
@@ -204,6 +212,8 @@ public class Hud implements MouseMotionListener, MouseListener {
 				hudMode = HUDMODE.OPS;
 			}
 			break;
+		case CONT:
+			break;
 		case CTCT:
 			if(selectedMobile.getOps(ELEMENT.HUD_OPS_CON.getIndex())){
 				selectedMobile.contact();
@@ -235,6 +245,10 @@ public class Hud implements MouseMotionListener, MouseListener {
 			}
 			break;
 		case MVS:
+			break;
+		case NEWG:
+			if(Tracon.loadSector("Terra Sector"))
+				hudMode = HUDMODE.OVERVIEW;
 			break;
 		case NULL:
 			System.out.println("WARN: NULL PROCESSED");

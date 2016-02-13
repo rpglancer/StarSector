@@ -75,7 +75,7 @@ public class Mobile extends Entity{
 		status = FSTATUS.HNDOFF;
 		canSelect = status.canSelect();
 		this.type = type;
-		this.name = "ShiggyDoo";
+		this.name = type.getType();
 		this.origin = origin;
 		this.destination = destination;
 		this.loc = new Coords(origin.getLoc().GetX(), origin.getLoc().GetY(), origin.getLoc().GetZ());
@@ -227,12 +227,13 @@ public class Mobile extends Entity{
 	}
 	
 	private int calcDegOffset(int cur, int des){
-		int c,d;
-		if(cur <= 180) c = 0 + cur;
-		else c = 360 - cur;
-		if(des <= 180) d = 0 + des;
-		else d = 360 - des;
-		return (Math.abs(c - d));
+		int a = (Math.abs(cur - des));
+		if(a > 180){
+			a = 360 - a;
+			return a + des;
+		}
+		else
+			return a;
 	}
 	
 	private void throttle(){

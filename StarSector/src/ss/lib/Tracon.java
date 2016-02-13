@@ -3,8 +3,12 @@ package ss.lib;
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
 import java.util.LinkedList;
+import java.util.Random;
+import java.util.Vector;
 
 import ss.StarSector;
+import ss.type.STYPE;
+import ss.util.XMLParser;
 
 /**
  * The underlying manager for the sector of space under the control of the player. Tracon keeps<br>
@@ -16,9 +20,14 @@ public class Tracon {
 
 	private static LinkedList<Entity> Mobiles = new LinkedList<Entity>();
 	private static LinkedList<Entity> Statics = new LinkedList<Entity>();
-	@Deprecated
-	public Tracon(){
-	}
+	
+	private static int arrivalRate = 1;
+	private static int departRate = 1;
+	
+	private static long TOLA	= 0;	//	Time Of Last Arrival
+	private static long TOLD	= 0;	//	Time Of Last Departure
+	private static long TSLA	= 0;	//	Time Since Last Arrival
+	private static long TSLD 	= 0;	//	Time Since Lase Departure
 	
 	public static void initTracon(){
 		if(Mobiles.size() > 0){
@@ -31,9 +40,6 @@ public class Tracon {
 				Statics.pop();
 			}
 		}
-		// gen gates
-		// gen stations
-		// gen fixes
 	}
 	
 	public static void addMobile(Mobile m){
@@ -42,6 +48,27 @@ public class Tracon {
 	
 	public static void addStatic(Static s){
 		Statics.push(s);
+	}
+	
+	public static int getArrivalRate(){
+		return arrivalRate;
+	}
+	
+	public static int getDepartRate(){
+		return departRate;
+	}
+	
+	public static boolean loadSave(){
+		initTracon();
+		return true;
+	}
+	
+	public static boolean loadSector(String sname){
+		initTracon();
+		XMLParser xmlp = new XMLParser();
+		xmlp.parseXmlFile();
+		xmlp.parseDocument();
+		return true;
 	}
 	
 	@Deprecated
@@ -127,16 +154,67 @@ public class Tracon {
 		}
 	}
 	
+	public static void setDepartRate(int rate){
+		departRate = rate;
+	}
+	
+	public static void setArrivalRate(int rate){
+		arrivalRate = rate;
+	}
+	
 	/**
 	 * Causes all Entity currently being managed by Tracon to update.
 	 */
 	public static void tick(){
+		updateTime();
+		if(newArrival()){
+			Vector<Static> as = new Vector<Static>();
+			for(int i = 0; i < Statics.size(); i++){
+				Static s = (Static)Statics.get(i);
+				System.out.println(s.getSTYPE() + " " + s.isAvailableForDepart());
+				if(s.getSTYPE() == STYPE.GATE && s.isAvailableForDepart()){
+					as.add(s);
+				}
+			}
+			if(as.size() > 0){
+				Random rand = new Random(System.currentTimeMillis());
+				int index = rand.nextInt(as.size());
+				as.get(index).releaseDeparture();
+			}
+			else{
+				System.out.println("WARN: NewArrival unable to spawn due to null available Static set.");
+			}
+		}
+		if(newDeparture()){
+			
+		}
 		for(int i = 0; i < Statics.size(); i++){
 			Statics.get(i).tick();
 		}
 		for(int i = 0; i < Mobiles.size(); i++){
 			Mobiles.get(i).tick();
 		}
+	}
+	
+	private static boolean newArrival(){
+		if(TSLA >= 600000 / arrivalRate){
+			TOLA = System.currentTimeMillis();
+			return true;
+		}
+		return false;
+	}
+	
+	private static boolean newDeparture(){
+		if(TSLD >= 600000 / departRate){
+			TOLD = System.currentTimeMillis();
+			return true;
+		}
+		return false;
+	}
+	
+	private static void updateTime(){
+		TSLA = System.currentTimeMillis() - TOLA;
+		TSLD = System.currentTimeMillis() - TOLD;
 	}
 	
 }

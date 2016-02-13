@@ -9,11 +9,7 @@ import java.io.IOException;
 import javax.swing.JFrame;
 
 import ss.lib.Hud;
-import ss.lib.Mobile;
 import ss.lib.SpriteSheet;
-import ss.lib.Static;
-import ss.type.MTYPE;
-import ss.type.STYPE;
 import ss.util.BufferedImageLoader;
 
 
@@ -137,6 +133,7 @@ public class StarSector extends Canvas implements Runnable{
 	}
 	
 	private synchronized void stop(){
+		System.out.println("Stop called!");
 		if(!running){
 			return;
 		}

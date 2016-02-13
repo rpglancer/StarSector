@@ -11,6 +11,21 @@
 				<X>110</X>
 				<Y>40</Y>
 				<Z>85</Z>
+				<DEPART>
+					<H>90</H>
+					<M>175</M>
+				</DEPART>
+				<ARRIVE>
+					<H>180</H>
+					<M>90</M>
+				</ARRIVE>
+			</Static>
+			<Static>
+				<Type>FIX</Type>
+				<Name>SHIGY</Name>
+				<X>512</X>
+				<Y>400</Y>
+				<Z>400</Z>
 			</Static>
 		</Contents>
 	</Sector>

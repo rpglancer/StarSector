@@ -19,6 +19,25 @@ public class Calc {
 	private static double convertMark(double mk){
 		return 90 - mk;
 	}
+
+	public static Coords convertCourseToCoords(Coords src, int brng, int mk, int dist){
+		double vv[] = getP(brng, mk);
+		double km = dist * StarSector.PPKM;
+		double ex = km * vv[0];
+		double ey = km * vv[1];
+		double ez = km * vv[2];
+		if(brng > 180) ex = -ex;
+		if(brng > 270 || brng < 90) ey = -ey;
+		if(mk < 90) ez = -ez;
+		ex += src.GetX();
+		ey += src.GetY();
+		ez += src.GetZ();
+		return new Coords(ex, ey, ez);
+//		double x = src.GetX() + (dist * Math.sin(Math.toRadians(brng)));
+//		double y = src.GetY() - (dist * Math.cos(Math.toRadians(brng)));
+//		double z = src.GetZ() - (dist * Math.cos(Math.toRadians(mk)));
+//		return new Coords(x,y,z);
+	}
 	
 	/**
 	 * Create a movement vector for a mobile.
@@ -28,7 +47,7 @@ public class Calc {
 	public static Coords mVector(Mobile m){
 		double spd = KMPS(m.getSpd());
 		double vv[] = getP(m.getHdg(), m.getMK());
-		System.out.println("mVector: " + vv[0] + ", " + vv[1] + ", " + vv[2]);
+//		System.out.println("mVector: " + vv[0] + ", " + vv[1] + ", " + vv[2]);
 		double ex = spd * vv[0];
 		double ey = spd * vv[1];
 		double ez = spd * vv[2];
