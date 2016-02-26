@@ -20,6 +20,7 @@ public class StarSector extends Canvas implements Runnable{
 	 */
 	private static final long serialVersionUID = 8384324761945636774L;
 	private boolean running = false;
+	private static boolean caughtStop = false;
 	
 	public static final int SPRITEHEIGHT = 16;
 	public static final int SPRITEWIDTH = 16;
@@ -36,15 +37,24 @@ public class StarSector extends Canvas implements Runnable{
 	
 	public static SpriteSheet Sprites;
 	
+	private static boolean isPaused = true;
+	
 	private static final int VER_MAJOR = 0;
-	private static final int VER_MINOR = 0;
-	private static final int VER_REV = 9;
+	private static final int VER_MINOR = 1;
+	private static final int VER_REV = 0;
 	private static final String VER_REL = "p";
 	
 	private Hud hud;
 	private BufferedImage bufimg = new BufferedImage(WIDTH,HEIGHT,BufferedImage.TYPE_INT_RGB);
 	private Thread thread;
 	
+	public static void exit(){
+		caughtStop = true;
+	}
+	
+	public static void setPause(boolean pause){
+		isPaused = pause;
+	}
 
 	public static void main(String[] args) {
 		StarSector SS = new StarSector();
@@ -76,12 +86,15 @@ public class StarSector extends Canvas implements Runnable{
 		timer = System.currentTimeMillis();
 		
 		while(running){
+			if(caughtStop){
+				running = false;
+			}
 			long now = System.nanoTime();
 //			now = System.nanoTime();
 			delta += (now - lastTime) / ns;
 			lastTime = now;
 			if(delta >= 1){
-				hud.tick();
+				if(!isPaused) hud.tick();
 //				System.out.println("Tick");
 				delta = 0;
 			}
@@ -91,6 +104,7 @@ public class StarSector extends Canvas implements Runnable{
 			render();
 		}
 		stop();
+		return;
 	}
 	
 	private void init(){
@@ -134,14 +148,17 @@ public class StarSector extends Canvas implements Runnable{
 	
 	private synchronized void stop(){
 		System.out.println("Stop called!");
-		if(!running){
-			return;
-		}
+//		if(!running){
+//			return;
+//		}
 		try{
-			thread.join();
+			System.out.println("thread.join() called.");
+			thread.join(1);		// I have no idea what I'm doing ;_;
 		} catch(InterruptedException e){
 			e.printStackTrace();
 		}
+		System.out.println("thread.join() completed.");
+		System.out.println("System.exit(1) called.");
 		System.exit(1);
 	}
 	

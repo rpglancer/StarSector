@@ -8,20 +8,26 @@ import ss.StarSector;
 public enum ELEMENT {
 	HUD_MNU_NEW		(0, HUDMODE.MENU,	RESPONSE.NEWG,		Color.darkGray,	Color.darkGray, StarSector.WIDTH / 2 - 64, StarSector.HEIGHT / 2, 128, 32),
 	HUD_MNU_CNT		(1, HUDMODE.MENU,	RESPONSE.CONT,		Color.darkGray,	Color.darkGray, StarSector.WIDTH / 2 - 64, StarSector.HEIGHT / 2 + 48, 128, 32),
+	HUD_MNU_EXIT	(2, HUDMODE.MENU,	RESPONSE.EXIT,		Color.darkGray,	Color.darkGray,	StarSector.WIDTH / 2 - 64, StarSector.HEIGHT / 2 + 96, 128, 32),	
 	HUD_OVW_RULER	(0, HUDMODE.OVERVIEW, RESPONSE.RULER,	Color.darkGray, Color.darkGray,	StarSector.WIDTH - 64, 0, 32, 16),
 	HUD_OVW_XYSWP	(1, HUDMODE.OVERVIEW, RESPONSE.XY, 		Color.darkGray, Color.darkGray,	StarSector.WIDTH - 32, 0, 32, 16),
 	HUD_OVW_CLOCK 	(2, HUDMODE.OVERVIEW, RESPONSE.CLOCK,	Color.darkGray, Color.darkGray,	0, 0, 80, 16),
 	HUD_OVW_ENTITY	(3, HUDMODE.OVERVIEW, RESPONSE.ENTITY,	Color.darkGray, Color.darkGray,	80, 0, 80, 16),
 	HUD_OVW_OPS		(4, HUDMODE.OVERVIEW, RESPONSE.OPS,		Color.darkGray,	Color.darkGray,	160, 0, 32, 16),
-	HUD_OPS 		(0, HUDMODE.OPS, 	RESPONSE.NULL,			Color.black, Color.darkGray,	160, 16, 128, 104),
-	HUD_OPS_HDG 	(1, HUDMODE.OPS, 	RESPONSE.HDG, 			Color.darkGray, Color.green,	HUD_OPS.getX() + 8, 24, 52, 16),
-	HUD_OPS_SPD 	(2, HUDMODE.OPS, 	RESPONSE.SPD,			Color.darkGray, Color.green,	HUD_OPS_HDG.getX() + 60, 24, 52, 16),
-	HUD_OPS_HLD 	(3, HUDMODE.OPS, 	RESPONSE.HOLD,			Color.darkGray, Color.green,	HUD_OPS.getX() + 8, HUD_OPS_HDG.getY() + 24, 32, 16),
-	HUD_OPS_DCT 	(4, HUDMODE.OPS, 	RESPONSE.DCT,			Color.darkGray, Color.green,	HUD_OPS_HLD.getX() + 40, HUD_OPS_HLD.getY(), 32, 16),
-	HUD_OPS_APR 	(5, HUDMODE.OPS, 	RESPONSE.APRCLR,		Color.darkGray, Color.green,	HUD_OPS_DCT.getX() + 40, HUD_OPS_DCT.getY(), 32, 16),
-	HUD_OPS_XMT 	(6, HUDMODE.OPS, 	RESPONSE.XMIT,			Color.darkGray, Color.green,	HUD_OPS.getX() + 8, HUD_OPS_APR.getY() + 24, 52, 16),
-	HUD_OPS_DIS 	(7, HUDMODE.OPS, 	RESPONSE.DISR,			Color.darkGray, Color.green,	HUD_OPS_XMT.getX() + 60, HUD_OPS_XMT.getY(), 52, 16),
-	HUD_OPS_CON		(8, HUDMODE.OPS, 	RESPONSE.CTCT,			Color.darkGray, Color.green,	HUD_OPS.getX() + 8, HUD_OPS_DIS.getY() + 24, 112, 16),
+	HUD_OPS 		(0, HUDMODE.OPS, 	RESPONSE.NULL,		Color.black, Color.darkGray,	160, 16, 128, 104),
+	HUD_OPS_HDG 	(1, HUDMODE.OPS, 	RESPONSE.HDG, 		Color.darkGray, Color.green,	HUD_OPS.getX() + 8, 24, 52, 16),
+	HUD_OPS_SPD 	(2, HUDMODE.OPS, 	RESPONSE.SPD,		Color.darkGray, Color.green,	HUD_OPS_HDG.getX() + 60, 24, 52, 16),
+	HUD_OPS_HLD 	(3, HUDMODE.OPS, 	RESPONSE.HOLD,		Color.darkGray, Color.green,	HUD_OPS.getX() + 8, HUD_OPS_HDG.getY() + 24, 32, 16),
+	HUD_OPS_DCT 	(4, HUDMODE.OPS, 	RESPONSE.DCT,		Color.darkGray, Color.green,	HUD_OPS_HLD.getX() + 40, HUD_OPS_HLD.getY(), 32, 16),
+	HUD_OPS_APR 	(5, HUDMODE.OPS, 	RESPONSE.APRCLR,	Color.darkGray, Color.green,	HUD_OPS_DCT.getX() + 40, HUD_OPS_DCT.getY(), 32, 16),
+	HUD_OPS_XMT 	(6, HUDMODE.OPS, 	RESPONSE.XMIT,		Color.darkGray, Color.green,	HUD_OPS.getX() + 8, HUD_OPS_APR.getY() + 24, 52, 16),
+	HUD_OPS_DIS 	(7, HUDMODE.OPS, 	RESPONSE.DISR,		Color.darkGray, Color.green,	HUD_OPS_XMT.getX() + 60, HUD_OPS_XMT.getY(), 52, 16),
+	HUD_OPS_CON		(8, HUDMODE.OPS, 	RESPONSE.CTCT,		Color.darkGray, Color.green,	HUD_OPS.getX() + 8, HUD_OPS_DIS.getY() + 24, 112, 16),
+	HUD_STA			(0, HUDMODE.STA, 	RESPONSE.NULL,		Color.darkGray, Color.darkGray, 0, 16, 160, 104),
+	HUD_STA_INFO	(1, HUDMODE.STA,	RESPONSE.NULL,		Color.darkGray, Color.darkGray, 8, 24, 160-16, 16),
+	HUD_STA_FROM	(2, HUDMODE.STA,	RESPONSE.NULL,		Color.darkGray, Color.darkGray,	HUD_STA_INFO.getX(), HUD_STA_INFO.getY(), 64, 16),
+	HUD_STA_AROW	(3, HUDMODE.STA,	RESPONSE.NULL,		Color.darkGray, Color.darkGray,	HUD_STA_FROM.getX() + 64, HUD_STA_FROM.getY(), 16, 16),
+	HUD_STA_TO		(4, HUDMODE.STA,	RESPONSE.NULL,		Color.darkGray, Color.darkGray, HUD_STA_AROW.getX() + 16, HUD_STA_AROW.getY(), 64, 16),
 	HUD_INP			(0, HUDMODE.INPUT, 	RESPONSE.NULL,		Color.black, Color.darkGray,	HUD_OPS.getX() + HUD_OPS.getW(), HUD_OPS.getY(), 128, 104),
 	HUD_INP_ONE		(1, HUDMODE.INPUT, 	RESPONSE.ONE,		Color.darkGray, Color.green,	HUD_INP.getX() + 8, HUD_INP.getY() + 8, 32, 16),
 	HUD_INP_TWO		(2, HUDMODE.INPUT, 	RESPONSE.TWO,		Color.darkGray, Color.green,	HUD_INP_ONE.getX() + 40, HUD_INP_ONE.getY(), 32, 16),
@@ -36,8 +42,6 @@ public enum ELEMENT {
 	HUD_INP_ZER		(11,HUDMODE.INPUT, 	RESPONSE.ZER,		Color.darkGray, Color.green,	HUD_INP_MRK.getX() + 40, HUD_INP_MRK.getY(), 32, 16),
 	HUD_INP_CAN		(12, HUDMODE.INPUT, RESPONSE.CNCL,		Color.darkGray, Color.green,	HUD_INP_ZER.getX() + 40, HUD_INP_MRK.getY(), 32, 16);
 	//HUD_INP_ACP		(13, HUDMODE.INPUT, RESPONSE.ACPT,		Color.darkGray, Color.green,	HUD_INP.getX() + 8, HUD_INP_SEV.getY() + 24, 32, 16);
-	
-	
 	
 	private int i;
 	private int x;

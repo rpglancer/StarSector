@@ -85,6 +85,10 @@ public class HudElement {
 		return element.getColorSecondary();
 	}
 	
+	public ELEMENT getElement(){
+		return element;
+	}
+	
 	public HUDMODE getElementMode(){
 		return element.getMode();
 	}

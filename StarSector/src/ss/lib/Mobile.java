@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
+import java.awt.geom.Line2D;
 import java.util.Vector;
 
 import ss.StarSector;
@@ -19,7 +20,8 @@ public class Mobile extends Entity{
 	private Coords dir;								// The directional vector of this Mobile.
 
 	private String name;
-	private String owner;
+//	private String owner;
+	private String serial;
 	
 	private Static destination		= null;			// The Static to which this Mobile is destined.
 	private Static origin			= null;			// The Static from which this Mobile originated.
@@ -30,6 +32,8 @@ public class Mobile extends Entity{
 	private double speedDesired		= 0;			// The desired speed of the Mobile [in m/s]
 	private double speedMax			= 0;			// The maximum speed of the Mobile [in m/s]
 	private double turnRateMax		= 5;			// The maximum turn rate of the Mobile [in deg/sec]
+	
+	private long blinkTimeLast;
 	
 	private int hdgCurrent			= 0;			// The current heading of the Mobile as viewed from an x/y perspective [0-359]
 	private int hdgDesired			= 0;			// The desired heading of the Mobile as viewed from an x/y perspective [0-359]
@@ -75,19 +79,21 @@ public class Mobile extends Entity{
 		status = FSTATUS.HNDOFF;
 		canSelect = status.canSelect();
 		this.type = type;
+		this.serial = Text.genSerial(this);
 		this.name = type.getType();
 		this.origin = origin;
 		this.destination = destination;
 		this.loc = new Coords(origin.getLoc().GetX(), origin.getLoc().GetY(), origin.getLoc().GetZ());
-		hdgCurrent = 315;
+		hdgCurrent = Calc.convertCoordsToHdg(loc, this.origin.getDepartCoords());
+		mkCurrent = Calc.convertCoordsToMk(loc, this.origin.getDepartCoords());
 		hdgDesired = hdgCurrent;
-		mkCurrent = 45;
 		mkDesired = mkCurrent;
 		accelMax = 5;
 		speedCurrent = 150;
 		speedDesired = speedCurrent;
 		speedMax = 150;
 		this.dir = Calc.dVector(this, Hud.getTimeProject());
+		blinkTimeLast = System.currentTimeMillis();
 		Tracon.addMobile(this);
 	}
 	
@@ -128,6 +134,15 @@ public class Mobile extends Entity{
 		if(hdgCurrent != hdgDesired || mkCurrent != mkDesired){
 			turn();
 		}
+		if(mobOpsAct[ELEMENT.HUD_OPS_APR.getIndex()]){
+			if(Calc.doesIntersect(loc, dir, origin.getArriveCoords(), origin.getLoc())){
+				System.out.println("Calc.doesIntersect() returned true.");
+				Coords intcpt = Calc.intersection(loc, dir, origin.getLoc(), origin.getArriveCoords());
+				if(intcpt != null){
+					System.out.println("Mobile intercepts localizer at Coords: " + intcpt.GetX() + ", " + intcpt.GetY() + ", " + intcpt.GetZ());
+				}
+			}
+		}
 		loc.add(Calc.mVector(this));
 		dir = Calc.dVector(this, Hud.getTimeProject());
 	}
@@ -150,6 +165,10 @@ public class Mobile extends Entity{
 		mobOps[ELEMENT.HUD_OPS_CON.getIndex()] = false;
 	}
 	
+	public Static getOrigin(){
+		return origin;
+	}
+	
 	public double getHdg(){
 		return (double)hdgCurrent;
 	}
@@ -158,6 +177,7 @@ public class Mobile extends Entity{
 		return (double)mkCurrent;
 	}
 	
+	@Deprecated
 	public String getName(){
 		return name;
 	}
@@ -192,12 +212,20 @@ public class Mobile extends Entity{
 		return mobOpsAct[i];
 	}
 	
+	public String getSerial(){
+		return this.serial;
+	}
+	
 	/**
 	 * Obtains the current speed of this Mobile.
 	 * @return Current speed in m/s.
 	 */
 	public double getSpd(){
 		return this.speedCurrent;
+	}
+	
+	public MTYPE getMType(){
+		return this.type;
 	}
 	
 	/**
@@ -234,6 +262,17 @@ public class Mobile extends Entity{
 		}
 		else
 			return a;
+	}
+	
+	private Color getBlinkColor(Color c1, Color c2, int rate){
+		if(System.currentTimeMillis() - blinkTimeLast < rate){
+			return c1;
+		}
+		else{
+			if(System.currentTimeMillis() - blinkTimeLast > rate * 2)
+				blinkTimeLast = System.currentTimeMillis();
+			return c2;
+		}
 	}
 	
 	private void throttle(){
@@ -314,7 +353,7 @@ public class Mobile extends Entity{
 		case EMGNCY:
 			break;
 		case HNDOFF:
-			G.drawString(name, x, y);
+			G.drawString(serial.substring(3, serial.length()), x, y);
 			y+=fm.getAscent();
 			G.drawString((int)this.getSpd()+"", x, y);
 			break;
@@ -345,7 +384,7 @@ public class Mobile extends Entity{
 			G.setColor(Color.red);
 			break;
 		case HNDOFF:
-			G.setColor(Color.gray);
+			G.setColor(getBlinkColor(Color.lightGray, Color.gray, 250));
 			break;
 		case MISAPR:
 			G.setColor(Color.green);

@@ -11,7 +11,7 @@ import ss.type.STYPE;
 import ss.util.XMLParser;
 
 /**
- * The underlying manager for the sector of space under the control of the player. Tracon keeps<br>
+ * The underlying manager for the sector of space under the control of the player. Tracon keeps
  * the lists of all active Mobile and Static entities and culls those which are no longer relevant.
  * @author Matt Bangert
  *

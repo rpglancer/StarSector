@@ -7,12 +7,85 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
+import java.util.Random;
 
 import ss.StarSector;
-import ss.type.ALIGNH;
-import ss.type.ALIGNV;
 
 public class Text {
+	
+	private static enum ALIGNH{
+		LEFT,
+		CENTER,
+		RIGHT
+	};
+	
+	private static enum ALIGNV{
+		TOP,
+		MIDDLE,
+		BOTTOM
+	};
+	
+	public static ALIGNH alignCenter(){
+		return ALIGNH.CENTER;
+	}
+	
+	public static ALIGNH alignLeft(){
+		return ALIGNH.LEFT;
+	}
+	
+	public static ALIGNH alignRight(){
+		return ALIGNH.RIGHT;
+	}
+	
+	public static ALIGNV alignBottom(){
+		return ALIGNV.BOTTOM;
+	}
+	
+	public static ALIGNV alignMiddle(){
+		return ALIGNV.MIDDLE;
+	}
+	
+	public static ALIGNV alignTop(){
+		return ALIGNV.TOP;
+	}
+	
+	private static final String[] Races = {
+										"Ar", "Au", "Be",
+										"Cu", "Ga", "Ir",
+										"Mo", "Pt", "Xe"
+										};
+	
+	private static final String[] Corps = {
+	};
+	
+	private static final String[] StationSubject = {
+										"Bio", "Plasma", "Energy"
+	};
+	
+	private static final String[] StationFocus = {
+										"Weapons", "Research", "Production"
+	};
+	
+	private static final String[] StationTypes = {
+										"Outpost", "Lab", "Station",
+										"Forge", "Factory", "Complex"
+	};
+	
+	public static String genName(){
+		Random rand = new Random();
+		rand.setSeed(System.nanoTime());
+		return StationSubject[rand.nextInt(StationSubject.length)] + " " + StationFocus[rand.nextInt(StationFocus.length)] + " " + StationTypes[rand.nextInt(StationTypes.length)];
+	}
+	
+	public static String genSerial(Mobile m){
+		Random r = new Random();
+		r.setSeed(System.nanoTime());
+		int serial = (r.nextInt(9) + 1) * 1000;
+		serial += r.nextInt(9) * 100;
+		serial += r.nextInt(9) * 10;
+		serial += r.nextInt(9);
+		return m.getMType().getType() + "-" + serial + Races[r.nextInt(Races.length)];
+	}
 
 	private static void alignText(Graphics g, Font f, int x, int y, int w, ALIGNH ah, String text){
 		FontMetrics fm = g.getFontMetrics(f);
@@ -68,7 +141,7 @@ public class Text {
 		return tw;
 	}
 	
-	public static void BoxText(Graphics g, Font f, Rectangle r, ALIGNH h, ALIGNV v, String text){
+	public static void BoxText(Graphics g, Font f, Rectangle r, Text.ALIGNH h, Text.ALIGNV v, String text){
 		int c = lineCount(g, f, r.x + r.width - r.x, text);
 		FontMetrics m = g.getFontMetrics(f);
 		int y = r.y;

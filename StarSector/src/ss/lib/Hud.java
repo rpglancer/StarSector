@@ -13,8 +13,6 @@ import java.util.Date;
 import java.util.Vector;
 
 import ss.StarSector;
-import ss.type.ALIGNH;
-import ss.type.ALIGNV;
 import ss.type.ELEMENT;
 import ss.type.HUDMODE;
 import ss.type.RESPONSE;
@@ -51,6 +49,7 @@ public class Hud implements MouseMotionListener, MouseListener {
 	 * Vector containing all of the HudElements that comprise the Hud operations display.
 	 */
 	private Vector<HudElement> opsElements = new Vector<HudElement>();
+	private Vector<HudElement> staElements = new Vector<HudElement>();
 	private Vector<Integer> rulerElementsY = new Vector<Integer>();
 	private Vector<Integer> rulerElementsX = new Vector<Integer>();
 	
@@ -69,6 +68,9 @@ public class Hud implements MouseMotionListener, MouseListener {
 				break;
 			case OVERVIEW:
 				ovwElements.addElement(temp);
+				break;
+			case STA:
+				staElements.addElement(temp);
 				break;
 			default:
 				break;
@@ -226,6 +228,9 @@ public class Hud implements MouseMotionListener, MouseListener {
 			if(selectedMobile.getOps(ELEMENT.HUD_OPS_DCT.getIndex()))
 				xmit.setOpsActive(ELEMENT.HUD_OPS_DCT.getIndex(), !xmit.getOpsActive(ELEMENT.HUD_OPS_DCT.getIndex()));
 			break;
+		case EXIT:
+			StarSector.exit();
+			break;
 		case HDG:
 			if(selectedMobile.getOps(ELEMENT.HUD_OPS_HDG.getIndex())){
 				xmit.setInputDest(false);
@@ -247,8 +252,10 @@ public class Hud implements MouseMotionListener, MouseListener {
 		case MVS:
 			break;
 		case NEWG:
-			if(Tracon.loadSector("Terra Sector"))
+			if(Tracon.loadSector("Terra Sector")){
 				hudMode = HUDMODE.OVERVIEW;
+				StarSector.setPause(false);
+			}
 			break;
 		case NULL:
 			System.out.println("WARN: NULL PROCESSED");
@@ -421,40 +428,34 @@ public class Hud implements MouseMotionListener, MouseListener {
 			G2D.setColor(ovwElements.get(i).getColor());
 			G2D.draw(ovwElements.get(i).getElementArea());
 			G2D.setColor(ovwElements.get(i).getColorResponse());
-			Text.BoxText(G, Fonts.RadarText, ovwElements.get(i).getElementArea(), ALIGNH.CENTER, ALIGNV.MIDDLE, ovwElements.get(i).getElementResponse().getText());
+//			Text.BoxText(G, Fonts.RadarText, ovwElements.get(i).getElementArea(), ALIGNH.CENTER, ALIGNV.MIDDLE, ovwElements.get(i).getElementResponse().getText());
+			Text.BoxText(G, Fonts.RadarText, ovwElements.get(i).getElementArea(), Text.alignCenter(), Text.alignMiddle(), ovwElements.get(i).getElementResponse().getText());
 			if(ovwElements.get(i).getElementResponse() == RESPONSE.CLOCK)
-				Text.BoxText(G, Fonts.RadarText, ovwElements.get(i).getElementArea(), ALIGNH.CENTER, ALIGNV.MIDDLE, dateF.format(td));
+//				Text.BoxText(G, Fonts.RadarText, ovwElements.get(i).getElementArea(), ALIGNH.CENTER, ALIGNV.MIDDLE, dateF.format(td));
+				Text.BoxText(G, Fonts.RadarText, ovwElements.get(i).getElementArea(), Text.alignCenter(), Text.alignMiddle(), dateF.format(td));
 			if(ovwElements.get(i).getElementResponse() == RESPONSE.ENTITY && selectedMobile != null)
-				Text.BoxText(G, Fonts.RadarText, ovwElements.get(i).getElementArea(), ALIGNH.CENTER, ALIGNV.MIDDLE, selectedMobile.getName());	
+				Text.BoxText(G, Fonts.RadarText, ovwElements.get(i).getElementArea(), Text.alignCenter(), Text.alignMiddle(), selectedMobile.getSerial());
+//				Text.BoxText(G, Fonts.RadarText, ovwElements.get(i).getElementArea(), ALIGNH.CENTER, ALIGNV.MIDDLE, selectedMobile.getSerial());	
 		}
 		G2D.setColor(PrevC);
 	}
 
 	private void renderInput(Graphics G){
-		Graphics2D G2D = (Graphics2D)G;
-		Color PrevC = G2D.getColor();
-		G2D.setColor(Color.black);
-		G2D.fill(inputElements.get(0).getElementArea());
-		G2D.setColor(Color.darkGray);
-		G2D.draw(inputElements.get(0).getElementArea());
+		Color PrevC = G.getColor();
+		Draw.shape(G, inputElements.get(0).getElementArea(), 1, Color.darkGray, Color.black);
 		for(int i = 1; i < inputElements.size(); i++){
 			if(inputElements.get(i).isActive()){
-				G2D.setColor(Color.darkGray);
-				G2D.fill(inputElements.get(i).getElementArea());
-				G2D.setColor(Color.green);
-				G2D.draw(inputElements.get(i).getElementArea());
-				Text.BoxText(G, Fonts.HudText, inputElements.get(i).getElementArea(), ALIGNH.CENTER, ALIGNV.MIDDLE, inputElements.get(i).getElementResponse().getText());
+				Draw.shape(G, inputElements.get(i).getElementArea(), 1, Color.green, Color.darkGray);
+				G.setColor(Color.green);
+				Text.BoxText(G, Fonts.HudText, inputElements.get(i).getElementArea(), Text.alignCenter(), Text.alignMiddle(), inputElements.get(i).getElementResponse().getText());
 			}
 			else{
-				G2D.setColor(Color.darkGray);
-				G2D.fill(inputElements.get(i).getElementArea());
-				G2D.setColor(Color.red);
-				G2D.draw(inputElements.get(i).getElementArea());
-				G2D.setColor(Color.black);
-				Text.BoxText(G, Fonts.HudText, inputElements.get(i).getElementArea(), ALIGNH.CENTER, ALIGNV.MIDDLE, inputElements.get(i).getElementResponse().getText());
+				Draw.shape(G, inputElements.get(i).getElementArea(), 1, Color.red, Color.darkGray);
+				G.setColor(Color.black);
+				Text.BoxText(G, Fonts.HudText, inputElements.get(i).getElementArea(), Text.alignCenter(), Text.alignMiddle(), inputElements.get(i).getElementResponse().getText());
 			}
 		}
-		G2D.setColor(PrevC);
+		G.setColor(PrevC);
 	}
 	
 	private void renderMainMenu(Graphics G){
@@ -466,8 +467,10 @@ public class Hud implements MouseMotionListener, MouseListener {
 			G2D.fill(menuElements.get(i).getElementArea());
 			G2D.setColor(Color.green);
 			G2D.draw(menuElements.get(i).getElementArea());
-			Text.BoxText(G, Fonts.RadarText, menuElements.get(i).getElementArea(), ALIGNH.CENTER, ALIGNV.MIDDLE, menuElements.get(i).getElementResponse().getText());
+			Text.BoxText(G, Fonts.RadarText, menuElements.get(i).getElementArea(), Text.alignCenter(), Text.alignMiddle(), menuElements.get(i).getElementResponse().getText());
 		}
+		G.setColor(prevC);
+		G.setFont(prevF);
 	}
 	
 	private void renderOps(Graphics G){
@@ -480,42 +483,27 @@ public class Hud implements MouseMotionListener, MouseListener {
 		G2D.draw(opsElements.get(0).getElementArea());
 		for(int i = 1; i < opsElements.size(); i++){
 			if(selectedMobile.getOps(i)){
-//				if(selectedMobile.getOpsActive(i)){
 				if(xmit.getOpsActive(i)){
 					// Selected Operation is Available and Active
-					G2D.setColor(Color.green);
-					G2D.fill(opsElements.get(i).getElementArea());
-					G2D.setColor(Color.green);
-					G2D.draw(opsElements.get(i).getElementArea());
+					Draw.shape(G, opsElements.get(i).getElementArea(), 1, Color.green, Color.green);
 					G2D.setColor(Color.white);
-					Text.BoxText(G, Fonts.RadarText, opsElements.get(i).getElementArea(), ALIGNH.CENTER, ALIGNV.MIDDLE, opsElements.get(i).getElementResponse().getText());
+					Text.BoxText(G, Fonts.RadarText, opsElements.get(i).getElementArea(), Text.alignCenter(), Text.alignMiddle(), opsElements.get(i).getElementResponse().getText());
 				}
 				else{
 					// Selected Operation is Available and Inactive
-					G2D.setColor(opsElements.get(i).getColorP());
-					G2D.fill(opsElements.get(i).getElementArea());
-					G2D.setColor(opsElements.get(i).getColorS());
-					G2D.draw(opsElements.get(i).getElementArea());
+					Draw.shape(G, opsElements.get(i).getElementArea(), 1, opsElements.get(i).getColorS(), opsElements.get(i).getColorP());
 					G2D.setColor(Color.green);
-					Text.BoxText(G, Fonts.HudText, opsElements.get(i).getElementArea(), ALIGNH.CENTER, ALIGNV.MIDDLE, opsElements.get(i).getElementResponse().getText());
+					Text.BoxText(G, Fonts.HudText, opsElements.get(i).getElementArea(), Text.alignCenter(), Text.alignMiddle(), opsElements.get(i).getElementResponse().getText());
 				}
 			}
 			else{
 				// Selected Operation is Unavailable
-				G2D.setColor(Color.darkGray);
-				G2D.fill(opsElements.get(i).getElementArea());
-				G2D.setColor(Color.red);
-				G2D.draw(opsElements.get(i).getElementArea());
+				Draw.shape(G, opsElements.get(i).getElementArea(), 1, Color.red, Color.darkGray);
 				G2D.setColor(Color.black);
-				Text.BoxText(G, Fonts.HudText, opsElements.get(i).getElementArea(), ALIGNH.CENTER, ALIGNV.MIDDLE, opsElements.get(i).getElementResponse().getText());
+				Text.BoxText(G, Fonts.HudText, opsElements.get(i).getElementArea(), Text.alignCenter(), Text.alignMiddle(), opsElements.get(i).getElementResponse().getText());
 			}
-//			G2D.setColor(opsElements.get(i).getColorP());
-//			G2D.fill(opsElements.get(i).getElementArea());
-//			G2D.setColor(opsElements.get(i).getColorS());
-//			G2D.draw(opsElements.get(i).getElementArea());
-//			G2D.setColor(opsElements.get(i).getColorResponse());
-//			Text.BoxText(G, Fonts.RadarText, opsElements.get(i).getElementArea(), ALIGNH.CENTER, ALIGNV.MIDDLE, opsElements.get(i).getElementResponse().getText());
 		}
+		renderStatus(G);
 		G2D.setFont(PrevF);
 		G2D.setColor(PrevC);
 	}
@@ -547,6 +535,22 @@ public class Hud implements MouseMotionListener, MouseListener {
 		}
 		G.setColor(prevC);
 		G.setFont(prevF);
+	}
+	
+	private void renderStatus(Graphics G){
+		Draw.shape(G, staElements.get(0).getElementArea(), 1, Color.darkGray, Color.black);
+		for(int i = 1; i < staElements.size(); i++){
+			Draw.shape(G, staElements.get(i).getElementArea(), 0, Color.darkGray, Color.black);
+			switch(staElements.get(i).getElement()){
+			case HUD_STA_FROM:
+				G.setColor(Color.cyan);
+				Text.BoxText(G, Fonts.HudText, staElements.get(i).getElementArea(), Text.alignLeft(), Text.alignMiddle(), "FROM:");
+				Text.BoxText(G, Fonts.HudText, staElements.get(i).getElementArea(), Text.alignRight(), Text.alignMiddle(), selectedMobile.getOrigin().getName());
+				break;
+			default:
+				break;
+			}
+		}
 	}
 	
 	private void toggleRuler(){

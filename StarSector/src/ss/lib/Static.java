@@ -9,6 +9,7 @@ import ss.type.MTYPE;
 import ss.type.STYPE;
 
 public class Static extends Entity {
+	
 	private STYPE type;
 	private String Name;
 	
@@ -30,7 +31,6 @@ public class Static extends Entity {
 	}
 	
 	public Static(String type, String name, int x, int y, int z){
-//		System.out.println("Static constructor called with settings " + type + ", " + name + ", " + x + ", " + y + ", " + z);
 		switch(type){
 		case "STATION":
 			this.type = STYPE.STATION;
@@ -48,7 +48,6 @@ public class Static extends Entity {
 		this.loc = new Coords(x,y,z);
 		this.canSelect = false;
 		this.Queue = new Vector<Mobile>();
-//		System.out.println("DBG: " + this + " of type " + this.type + " created!");
 	}
 
 	@Override
@@ -79,6 +78,9 @@ public class Static extends Entity {
 		if(Departure != null){
 			Draw.line(g, loc, Departure, Color.pink, p);
 		}
+		if(Arrival != null){
+			Draw.line(g, loc, Arrival, Color.green, p);
+		}
 	}
 
 	@Override
@@ -86,6 +88,17 @@ public class Static extends Entity {
 		updateTime();
 	}
 	
+	public Coords getArriveCoords(){
+		return this.Arrival;
+	}
+	
+	public Coords getDepartCoords(){
+		return this.Departure;
+	}
+	
+	public String getName(){
+		return Name;
+	}
 
 	public STYPE getSTYPE(){
 		return type;
@@ -104,6 +117,10 @@ public class Static extends Entity {
 	public void releaseDeparture(){
 		new Mobile(MTYPE.M3, this, null);
 		TOLD = System.currentTimeMillis();
+	}
+	
+	public void setArriveCoords(Coords arrive){
+		Arrival = arrive;
 	}
 	
 	public void setDepartCoords(Coords depart){

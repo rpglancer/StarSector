@@ -1,34 +1,36 @@
 package ss.lib;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Rectangle;
+import java.awt.Shape;
 import java.awt.image.BufferedImage;
 import java.util.Vector;
 
 import ss.StarSector;
 
 public class Draw {
-	
-	public static void box(Graphics G, Rectangle R, int BSize, Color Border, Color Fill){
-		Graphics2D G2D = (Graphics2D) G;
-		Color PrevC = G2D.getColor();
-		
-		if(BSize < 1){
-			G2D.setColor(Fill);
-			G2D.fill(R);
+/**
+ * @param g
+ * @param s	The shape to draw
+ * @param bSize	The border [outline] thickness of the shape
+ * @param border The color of the border
+ * @param fill The color to fill the shape with
+ */
+	public static void shape(Graphics g, Shape s, int bSize, Color border, Color fill){
+		Graphics2D g2d = (Graphics2D)g;
+		Color prevC = g2d.getColor();
+		g2d.setColor(fill);
+		g2d.fill(s);
+		if(bSize > 0){
+			g2d.setColor(border);
+			BasicStroke bs = new BasicStroke(bSize);
+			g2d.setStroke(bs);
+			g2d.draw(s);
 		}
-		else{
-			G2D.setColor(Border);
-			G2D.fill(R);
-			Rectangle Temp = new Rectangle(R);
-			Temp.setRect(Temp.getX() + BSize, Temp.getY() + BSize, Temp.getWidth() - (BSize *2), Temp.getHeight() - (BSize * 2));
-			G2D.setColor(Fill);
-			G2D.fill(Temp);
-		}
-		G2D.setColor(PrevC);
+		g2d.setColor(prevC);
 	}
 	
 	public static void circle_centered(Graphics G, Coords coords, int rad, Color color, boolean p){

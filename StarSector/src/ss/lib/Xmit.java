@@ -28,14 +28,18 @@ public class Xmit {
 	 */
 	private int inputStatus;
 	
-	private boolean[] opsAct = {false, false, false, false, false, false, false, false, false};
+	private boolean[] opsAct = 		{false, false, false,
+									 false, false, false,
+									 false, false, false};
 	/**
 	 * Array for managing the availability of input HudElements as they pertain to the Mobile for
 	 * which this Xmit will apply.<br>
 	 */
-	private boolean[] inputAvail = {false, false, false, false, false,
-									false, false, false, false, false,
-									false, false, false };
+	private boolean[] inputAvail = 	{false, false, false,
+									 false, false, false,
+									 false, false, false,
+									 false, false, false,
+									 false };
 	/**
 	 * The destination for numeric input to be applied.<br>
 	 * <b>true</b>: speed<br>

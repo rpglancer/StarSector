@@ -12,6 +12,10 @@ public class Coords {
 	private double y;
 	private double z;
 	
+	public Coords(){
+		
+	}
+	
 	public Coords(double x, double y, double z){
 		this.x = x;
 		this.y = y;
@@ -29,12 +33,6 @@ public class Coords {
 	public double GetZ(){
 		return z;
 	}
-
-	@Deprecated
-	public double[] GetCoords(){
-		double temp[] = {x,y,z};
-		return temp;
-	}
 	
 	public void SetCoords(double x, double y, double z){
 		this.x = x;
@@ -42,17 +40,14 @@ public class Coords {
 		this.z = z;
 	}
 	
-	@Deprecated
 	public void SetX(double x){
 		this.x = x;
 	}
 	
-	@Deprecated
 	public void SetY(double y){
 		this.y = y;
 	}
 	
-	@Deprecated
 	public void SetZ(double z){
 		this.z = z;
 	}

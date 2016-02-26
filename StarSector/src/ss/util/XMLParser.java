@@ -84,6 +84,15 @@ public class XMLParser {
 				s.setDepartCoords(Calc.convertCourseToCoords(s.getLoc(), h, m, 10));
 			}
 		}
+		temp = staticEl.getElementsByTagName("ARRIVE");
+		if(temp != null && temp.getLength() > 0){
+			for(int i = 0; i < temp.getLength(); i++){
+				Element el = (Element)temp.item(i);
+				int h = getIntValue(el, "H");
+				int m = getIntValue(el, "M");
+				s.setArriveCoords(Calc.convertCourseToCoords(s.getLoc(), h, m, 10));
+			}
+		}
 		return s;
 //		return new Static(type, name, x, y, z);
 	}
