@@ -210,7 +210,8 @@ public class Hud implements MouseMotionListener, MouseListener {
 			break;
 		case CNCL:
 			if(inputElements.get(ELEMENT.HUD_INP_CAN.getIndex()).isActive()){
-				xmit.process(-2);
+//				xmit.process(-2);	// Deprecated
+				xmit.input(-2);
 				hudMode = HUDMODE.OPS;
 			}
 			break;
@@ -233,7 +234,8 @@ public class Hud implements MouseMotionListener, MouseListener {
 			break;
 		case HDG:
 			if(selectedMobile.getOps(ELEMENT.HUD_OPS_HDG.getIndex())){
-				xmit.setInputDest(false);
+				xmit.setInputDest(ELEMENT.HUD_OPS_HDG);
+//				xmit.setInputDest(false);	// Deprecated
 				refreshInputElements();
 				hudMode = HUDMODE.INPUT;
 			}
@@ -245,7 +247,8 @@ public class Hud implements MouseMotionListener, MouseListener {
 		case MARK:
 			if(inputElements.get(ELEMENT.HUD_INP_MRK.getIndex()).isActive()){
 //				xmit.processInput(-1);
-				xmit.process(-1);
+//				xmit.process(-1);	// Deprecated
+				xmit.input(-1);
 				refreshInputElements();
 			}
 			break;
@@ -262,14 +265,16 @@ public class Hud implements MouseMotionListener, MouseListener {
 			break;
 		case SPD:
 			if(selectedMobile.getOps(ELEMENT.HUD_OPS_SPD.getIndex())){
-				xmit.setInputDest(true);
+				xmit.setInputDest(ELEMENT.HUD_OPS_SPD);
+//				xmit.setInputDest(true);	// Deprecated
 				refreshInputElements();
 				hudMode = HUDMODE.INPUT;
 			}
 			break;
 		case ZER:
 			if(inputElements.get(ELEMENT.HUD_INP_ZER.getIndex()).isActive()){
-				xmit.process(0);
+//				xmit.process(0);	// Deprecated
+				xmit.input(0);
 				if(xmit.getInputStatus() == 0)
 					hudMode = HUDMODE.OPS;
 				else
@@ -278,7 +283,8 @@ public class Hud implements MouseMotionListener, MouseListener {
 			break;
 		case ONE:
 			if(inputElements.get(ELEMENT.HUD_INP_ONE.getIndex()).isActive()){
-				xmit.process(1);
+//				xmit.process(1);	// Deprecated
+				xmit.input(1);
 				if(xmit.getInputStatus() == 0)
 					hudMode = HUDMODE.OPS;
 				else
@@ -287,7 +293,8 @@ public class Hud implements MouseMotionListener, MouseListener {
 			break;
 		case TWO:
 			if(inputElements.get(ELEMENT.HUD_INP_TWO.getIndex()).isActive()){
-				xmit.process(2);
+//				xmit.process(2);	// Deprecated
+				xmit.input(2);
 				if(xmit.getInputStatus() == 0)
 					hudMode = HUDMODE.OPS;
 				else
@@ -296,7 +303,8 @@ public class Hud implements MouseMotionListener, MouseListener {
 			break;
 		case THREE:
 			if(inputElements.get(ELEMENT.HUD_INP_THR.getIndex()).isActive()){
-				xmit.process(3);
+//				xmit.process(3);	// Deprecated
+				xmit.input(3);
 				if(xmit.getInputStatus() == 0)
 					hudMode = HUDMODE.OPS;
 				else
@@ -305,7 +313,8 @@ public class Hud implements MouseMotionListener, MouseListener {
 			break;
 		case FOUR:
 			if(inputElements.get(ELEMENT.HUD_INP_FOU.getIndex()).isActive()){
-				xmit.process(4);
+//				xmit.process(4);	// Deprecated
+				xmit.input(4);
 				if(xmit.getInputStatus() == 0)
 					hudMode = HUDMODE.OPS;
 				else
@@ -313,8 +322,9 @@ public class Hud implements MouseMotionListener, MouseListener {
 			}
 			break;
 		case FIVE:
-			if(inputElements.get(ELEMENT.HUD_INP_EIG.getIndex()).isActive()){
-				xmit.process(5);
+			if(inputElements.get(ELEMENT.HUD_INP_FIV.getIndex()).isActive()){
+//				xmit.process(5);	// Deprecated
+				xmit.input(5);
 				if(xmit.getInputStatus() == 0)
 					hudMode = HUDMODE.OPS;
 				else
@@ -323,7 +333,8 @@ public class Hud implements MouseMotionListener, MouseListener {
 			break;
 		case SIX:
 			if(inputElements.get(ELEMENT.HUD_INP_SIX.getIndex()).isActive()){
-				xmit.process(6);
+//				xmit.process(6);	// Deprecated
+				xmit.input(6);
 				if(xmit.getInputStatus() == 0)
 					hudMode = HUDMODE.OPS;
 				else
@@ -332,7 +343,8 @@ public class Hud implements MouseMotionListener, MouseListener {
 			break;
 		case SEVEN:
 			if(inputElements.get(ELEMENT.HUD_INP_SEV.getIndex()).isActive()){
-				xmit.process(7);
+//				xmit.process(7);	// Deprecated
+				xmit.input(7);
 				if(xmit.getInputStatus() == 0)
 					hudMode = HUDMODE.OPS;
 				else
@@ -341,7 +353,8 @@ public class Hud implements MouseMotionListener, MouseListener {
 			break;
 		case EIGHT:
 			if(inputElements.get(ELEMENT.HUD_INP_EIG.getIndex()).isActive()){
-				xmit.process(8);
+//				xmit.process(8);	// Deprecated
+				xmit.input(8);
 				if(xmit.getInputStatus() == 0)
 					hudMode = HUDMODE.OPS;
 				else
@@ -350,7 +363,8 @@ public class Hud implements MouseMotionListener, MouseListener {
 			break;
 		case NINE:
 			if(inputElements.get(ELEMENT.HUD_INP_NIN.getIndex()).isActive()){
-				xmit.process(9);
+//				xmit.process(9);	// Deprecated
+				xmit.input(9);
 				if(xmit.getInputStatus() == 0)
 					hudMode = HUDMODE.OPS;
 				else
@@ -428,14 +442,11 @@ public class Hud implements MouseMotionListener, MouseListener {
 			G2D.setColor(ovwElements.get(i).getColor());
 			G2D.draw(ovwElements.get(i).getElementArea());
 			G2D.setColor(ovwElements.get(i).getColorResponse());
-//			Text.BoxText(G, Fonts.RadarText, ovwElements.get(i).getElementArea(), ALIGNH.CENTER, ALIGNV.MIDDLE, ovwElements.get(i).getElementResponse().getText());
 			Text.BoxText(G, Fonts.RadarText, ovwElements.get(i).getElementArea(), Text.alignCenter(), Text.alignMiddle(), ovwElements.get(i).getElementResponse().getText());
 			if(ovwElements.get(i).getElementResponse() == RESPONSE.CLOCK)
-//				Text.BoxText(G, Fonts.RadarText, ovwElements.get(i).getElementArea(), ALIGNH.CENTER, ALIGNV.MIDDLE, dateF.format(td));
 				Text.BoxText(G, Fonts.RadarText, ovwElements.get(i).getElementArea(), Text.alignCenter(), Text.alignMiddle(), dateF.format(td));
 			if(ovwElements.get(i).getElementResponse() == RESPONSE.ENTITY && selectedMobile != null)
 				Text.BoxText(G, Fonts.RadarText, ovwElements.get(i).getElementArea(), Text.alignCenter(), Text.alignMiddle(), selectedMobile.getSerial());
-//				Text.BoxText(G, Fonts.RadarText, ovwElements.get(i).getElementArea(), ALIGNH.CENTER, ALIGNV.MIDDLE, selectedMobile.getSerial());	
 		}
 		G2D.setColor(PrevC);
 	}

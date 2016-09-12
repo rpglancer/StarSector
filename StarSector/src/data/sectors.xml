@@ -21,6 +21,21 @@
 				</ARRIVE>
 			</Static>
 			<Static>
+				<Type>GATE</Type>
+				<Name>GMRS</Name>
+				<X>640</X>
+				<Y>400</Y>
+				<Z>240</Z>
+				<DEPART>
+					<H>270</H>
+					<M>90</M>
+				</DEPART>
+				<ARRIVE>
+					<H>0</H>
+					<M>90</M>
+				</ARRIVE>
+			</Static>
+			<Static>
 				<Type>FIX</Type>
 				<Name>SHIGY</Name>
 				<X>512</X>

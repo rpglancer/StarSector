@@ -70,6 +70,17 @@ public class Text {
 										"Outpost", "Lab", "Station",
 										"Forge", "Factory", "Complex"
 	};
+
+	public static Rectangle genTextArea(Graphics g, Coords src, Font font, String text){
+		FontMetrics fm = g.getFontMetrics(font);
+		int x = (int)src.GetX() - (fm.stringWidth(text)/2);
+		int y = 0;
+		if(Hud.getP()) y = (int)src.GetY();
+		else y = (int)src.GetZ();
+		int w = (int)fm.stringWidth(text);
+		int h = (int)fm.getHeight();
+		return new Rectangle(x,y,w,h);
+	}
 	
 	public static String genName(){
 		Random rand = new Random();

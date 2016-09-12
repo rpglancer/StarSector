@@ -41,7 +41,7 @@ public class StarSector extends Canvas implements Runnable{
 	
 	private static final int VER_MAJOR = 0;
 	private static final int VER_MINOR = 1;
-	private static final int VER_REV = 0;
+	private static final int VER_REV = 1;
 	private static final String VER_REL = "p";
 	
 	private Hud hud;
@@ -118,9 +118,6 @@ public class StarSector extends Canvas implements Runnable{
 		} catch(IOException e){
 			e.printStackTrace();
 		}
-		// Testing, feel free to remove.
-//		Static Test = new Static(STYPE.STATION);
-//		Mobile Mob = new Mobile(MTYPE.M5, Test, null);
 	}
 	
 	private void render(){
@@ -148,9 +145,6 @@ public class StarSector extends Canvas implements Runnable{
 	
 	private synchronized void stop(){
 		System.out.println("Stop called!");
-//		if(!running){
-//			return;
-//		}
 		try{
 			System.out.println("thread.join() called.");
 			thread.join(1);		// I have no idea what I'm doing ;_;
@@ -161,9 +155,4 @@ public class StarSector extends Canvas implements Runnable{
 		System.out.println("System.exit(1) called.");
 		System.exit(1);
 	}
-	
-	private void tick(){
-		
-	}
-
 }

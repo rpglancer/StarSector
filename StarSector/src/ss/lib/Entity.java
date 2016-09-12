@@ -14,6 +14,7 @@ public abstract class Entity {
 	protected boolean canSelect = false;
 	protected boolean isSelected = false;
 	
+	@Deprecated
 	protected Rectangle area;
 	
 	public abstract void deselect();

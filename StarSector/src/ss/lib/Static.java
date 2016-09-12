@@ -2,6 +2,7 @@ package ss.lib;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Rectangle;
 import java.util.Vector;
 
 import ss.StarSector;
@@ -13,8 +14,10 @@ public class Static extends Entity {
 	private STYPE type;
 	private String Name;
 	
-	private long TSLD = 800000;
-	private long TOLD = 0;
+	private boolean drawName = true;
+	
+	private long TSLR = 800000;			// Time Since Last Release
+	private long TOLR = 0;				// Time Of Last Release
 	
 	private Coords Arrival;
 	private Coords Departure;
@@ -23,7 +26,7 @@ public class Static extends Entity {
 	
 	public Static(STYPE type){
 		this.type = type;
-		this.Name = "TestStation";
+		this.Name = "UntitledStation";
 		this.loc = new Coords(StarSector.WIDTH / 2, StarSector.HEIGHT / 2, 120);
 		this.Queue = new Vector<Mobile>();
 		this.canSelect = false;
@@ -81,6 +84,9 @@ public class Static extends Entity {
 		if(Arrival != null){
 			Draw.line(g, loc, Arrival, Color.green, p);
 		}
+		if(drawName){
+			Text.BoxText(g, Fonts.RadarText, Text.genTextArea(g, loc, Fonts.RadarText, Name), Text.alignCenter(), Text.alignBottom(), Name);
+		}
 	}
 
 	@Override
@@ -104,21 +110,15 @@ public class Static extends Entity {
 		return type;
 	}
 	
-	public boolean isAvailableForDepart(){
-		if(type == STYPE.STATION){
-			return TSLD >= 600000 / Tracon.getDepartRate();
-		}
-		if(type == STYPE.GATE){
-			return TSLD >= 600000 / Tracon.getArrivalRate();
-		}
-		return false;
-	}
-
-	public void releaseDeparture(){
-		new Mobile(MTYPE.M3, this, null);
-		TOLD = System.currentTimeMillis();
+	public boolean availableForRelease(int rate){
+		return TSLR >= 600000 / rate;
 	}
 	
+	public void releaseCraft(){
+		new Mobile(MTYPE.M3, this, Tracon.getDestination(this));
+		TOLR = System.currentTimeMillis();
+	}
+
 	public void setArriveCoords(Coords arrive){
 		Arrival = arrive;
 	}
@@ -128,6 +128,6 @@ public class Static extends Entity {
 	}
 	
 	private void updateTime(){
-		TSLD = System.currentTimeMillis() - TOLD;
+		TSLR = System.currentTimeMillis() - TOLR;
 	}
 }

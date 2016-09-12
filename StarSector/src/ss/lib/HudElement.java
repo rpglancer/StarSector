@@ -15,15 +15,11 @@ public class HudElement {
 	private Rectangle elementArea;				//	This element's area
 	private ELEMENT	element;					//	The element information
 	
-	@Deprecated
-	public HudElement(Hud hud, Rectangle area, HUDMODE mode, RESPONSE response){
-		if(elementHud == null) elementHud = hud;
-		this.elementArea = area;
-//		this.elementMode = mode;
-//		this.elementResponse = response;
-//		this.elementColor = Color.DARK_GRAY;
-//		this.elementBlinkColor = Color.CYAN;
-	}
+//	@Deprecated
+//	public HudElement(Hud hud, Rectangle area, HUDMODE mode, RESPONSE response){
+//		if(elementHud == null) elementHud = hud;
+//		this.elementArea = area;
+//	}
 	
 	public HudElement(Hud hud, ELEMENT e){
 		if(elementHud == null) elementHud = hud;
@@ -101,25 +97,25 @@ public class HudElement {
 		return elementArea;
 	}
 	
-	@Deprecated
-	public int getX(){
-		return elementArea.x;
-	}
+//	@Deprecated
+//	public int getX(){
+//		return elementArea.x;
+//	}
 	
-	@Deprecated
-	public int getY(){
-		return elementArea.y;
-	}
+//	@Deprecated
+//	public int getY(){
+//		return elementArea.y;
+//	}
 	
-	@Deprecated
-	public int getHeight(){
-		return elementArea.height;
-	}
+//	@Deprecated
+//	public int getHeight(){
+//		return elementArea.height;
+//	}
 	
-	@Deprecated
-	public int getWidth(){
-		return elementArea.width;
-	}
+//	@Deprecated
+//	public int getWidth(){
+//		return elementArea.width;
+//	}
 	
 	public void setElementResponse(RESPONSE response){
 		element.setResponse(response);

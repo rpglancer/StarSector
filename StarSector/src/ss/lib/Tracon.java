@@ -27,7 +27,7 @@ public class Tracon {
 	private static long TOLA	= 0;	//	Time Of Last Arrival
 	private static long TOLD	= 0;	//	Time Of Last Departure
 	private static long TSLA	= 0;	//	Time Since Last Arrival
-	private static long TSLD 	= 0;	//	Time Since Lase Departure
+	private static long TSLD 	= 0;	//	Time Since Last Departure
 	
 	public static void initTracon(){
 		if(Mobiles.size() > 0){
@@ -56,6 +56,17 @@ public class Tracon {
 	
 	public static int getDepartRate(){
 		return departRate;
+	}
+	
+	public static Static getDestination(Static origin){
+		if(Statics.size() < 2) return null;
+		Random rand = new Random();
+		rand.setSeed(System.currentTimeMillis());
+		Static dest;
+		do{
+			dest = (Static)Statics.get(rand.nextInt(Statics.size()));
+		}while(dest == origin);
+		return dest;
 	}
 	
 	public static boolean loadSave(){
@@ -167,26 +178,12 @@ public class Tracon {
 	 */
 	public static void tick(){
 		updateTime();
-		if(newArrival()){
-			Vector<Static> as = new Vector<Static>();
-			for(int i = 0; i < Statics.size(); i++){
-				Static s = (Static)Statics.get(i);
-				System.out.println(s.getSTYPE() + " " + s.isAvailableForDepart());
-				if(s.getSTYPE() == STYPE.GATE && s.isAvailableForDepart()){
-					as.add(s);
-				}
-			}
-			if(as.size() > 0){
-				Random rand = new Random(System.currentTimeMillis());
-				int index = rand.nextInt(as.size());
-				as.get(index).releaseDeparture();
-			}
-			else{
-				System.out.println("WARN: NewArrival unable to spawn due to null available Static set.");
-			}
+		if(checkArrival()){
+			TOLA = System.currentTimeMillis();
+			addArrival();
 		}
-		if(newDeparture()){
-			
+		if(checkDeparture()){
+			TOLD = System.currentTimeMillis();
 		}
 		for(int i = 0; i < Statics.size(); i++){
 			Statics.get(i).tick();
@@ -196,20 +193,33 @@ public class Tracon {
 		}
 	}
 	
-	private static boolean newArrival(){
-		if(TSLA >= 600000 / arrivalRate){
-			TOLA = System.currentTimeMillis();
-			return true;
+	private static void addArrival(){
+		Vector<Static> as = new Vector<Static>();
+		for(int i = 0; i < Statics.size(); i++){
+			Static s = (Static)Statics.get(i);
+			if(s.getSTYPE() == STYPE.GATE && s.availableForRelease(getArrivalRate())){
+				as.add(s);
+			}
 		}
-		return false;
+		if(as.size() > 0){
+			Random rand = new Random(System.currentTimeMillis());
+			int index = rand.nextInt(as.size());
+			as.get(index).releaseCraft();
+		}
+		else{
+			System.out.println("WARN: NewArrival unable to spawn due to null available Static set.");
+		}
 	}
 	
-	private static boolean newDeparture(){
-		if(TSLD >= 600000 / departRate){
-			TOLD = System.currentTimeMillis();
-			return true;
-		}
-		return false;
+	private static void addDeparture(){
+	}
+	
+	private static boolean checkArrival(){
+		return TSLA >= 600000 / arrivalRate;
+	}
+	
+	private static boolean checkDeparture(){
+		return TSLD >= 600000 / departRate;
 	}
 	
 	private static void updateTime(){

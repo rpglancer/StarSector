@@ -22,8 +22,10 @@ public class Draw {
 	public static void shape(Graphics g, Shape s, int bSize, Color border, Color fill){
 		Graphics2D g2d = (Graphics2D)g;
 		Color prevC = g2d.getColor();
-		g2d.setColor(fill);
-		g2d.fill(s);
+		if(fill != null){
+			g2d.setColor(fill);
+			g2d.fill(s);
+		}
 		if(bSize > 0){
 			g2d.setColor(border);
 			BasicStroke bs = new BasicStroke(bSize);
@@ -84,7 +86,7 @@ public class Draw {
 	}
 	
 	public static void square_centered(Graphics G, Coords coords, int size, Color color, boolean p){
-		int x,y,w;
+		int x,y;
 		x = (int)coords.GetX();
 		if(p) y = (int)coords.GetY();
 		else y = (int)coords.GetZ();

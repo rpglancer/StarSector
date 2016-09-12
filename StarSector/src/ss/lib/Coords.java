@@ -61,4 +61,22 @@ public class Coords {
 		y += v.y;
 		z += v.z;
 	}
+	
+	public void sub(Coords v){
+		x -= v.x;
+		y -= v.y;
+		z -= v.z;
+	}
+	
+	public void multiply(Coords v){
+		x *= v.x;
+		y *= v.y;
+		z *= v.z;
+	}
+	
+	public void divide(Coords v){
+		x /= v.x;
+		y /= v.y;
+		z /= v.z;
+	}
 }

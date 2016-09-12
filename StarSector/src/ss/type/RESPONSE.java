@@ -2,8 +2,6 @@ package ss.type;
 
 import java.awt.Color;
 
-import ss.lib.Mobile;
-
 //	EnumID	Text	ColorAvail	 ColorNotAvail
 public enum RESPONSE {
 	NEWG	("NEW",		Color.green, Color.red),

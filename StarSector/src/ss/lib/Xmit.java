@@ -15,6 +15,7 @@ public class Xmit {
 	private int speed;
 	private int speedInit;
 	private int speedMax;
+	private byte[] speedFactor = {0,0,0};
 	
 	/**
 	 * Tracks and manages the status of input submitted via the Hud input.<br>
@@ -33,7 +34,13 @@ public class Xmit {
 									 false, false, false};
 	/**
 	 * Array for managing the availability of input HudElements as they pertain to the Mobile for
-	 * which this Xmit will apply.<br>
+	 * which this Xmit will apply.<br><br>
+	 * [index]:[value]<br>
+	 * 0:unused<br>
+	 * 1:1 2:2 3:3<br>
+	 * 4:4 5:5 6:6<br>
+	 * 7:7 8:8 9:9<br>
+	 * 10:. 11:0 12:CNCL<br>
 	 */
 	private boolean[] inputAvail = 	{false, false, false,
 									 false, false, false,
@@ -46,6 +53,9 @@ public class Xmit {
 	 * <b>false</b>: heading<br>
 	 */
 	private boolean inputDest = false;
+	
+	private ELEMENT eleDest;
+	
 	private Static waypoint;
 	
 	/**
@@ -104,10 +114,98 @@ public class Xmit {
 		return speed;
 	}
 	
+	private void factorSpeed(){
+		int s = 0;
+		byte c = 0;
+		for(s = this.speedMax, c = 0; s >= 100; s-=100, c++);
+		speedFactor[0] = c;
+		for(c = 0; s >= 10; s-=10, c++);
+		speedFactor[1] = c;
+		for(c = 0; s > 0; s-=1, c++);
+		speedFactor[2] = c;
+//		System.out.println("Factored Speed: " + speedFactor[0] + "," +speedFactor[1] + "," + speedFactor[2]);
+	}
+	
 	public Static getWaypoint(){
 		return waypoint;
 	}
 
+	public void input(int val){
+		if(val == -2){
+			if(eleDest == ELEMENT.HUD_OPS_SPD)
+				initSpd();
+			if(eleDest == ELEMENT.HUD_OPS_HDG)
+				initHdg();
+			return;
+		}
+		if(eleDest == ELEMENT.HUD_OPS_SPD){
+			adjustSpeed(val);
+		}
+		if(eleDest == ELEMENT.HUD_OPS_HDG){
+			adjustHdg(val);
+		}
+		updateInpStatus();
+	}
+	
+	public void adjustSpeed(int val){
+		switch(inputStatus){
+		case 100:
+			this.speed = val * 100;
+			inputStatus = 10;
+			break;
+		case 10:
+			this.speed += val * 10;
+			inputStatus = 1;
+			break;
+		case 1:
+			this.speed += val;
+			inputStatus = 0;
+			break;
+		}
+	}
+
+	public void adjustHdg(int val){
+		switch(inputStatus){
+		case 100:
+			if(val == -1){
+				this.heading = headingInit;
+				inputStatus = -100;
+			}
+			else{
+				this.heading = val * 100;
+				inputStatus = 10;
+			}
+			break;
+		case 10:
+			if(val == -1) inputStatus = -100;
+			else{
+				this.heading += val * 10;
+				inputStatus = 1;
+			}
+			break;
+		case 1:
+			if(val == -1) inputStatus = -100;
+			else{
+				this.heading += val;
+				inputStatus = -100;
+			}
+			break;
+		case -100:
+			this.mark = val * 100;
+			inputStatus = -10;
+			break;
+		case -10:
+			this.mark += val * 10;
+			inputStatus = -1;
+			break;
+		case -1:
+			this.mark += val;
+			inputStatus = 0;
+			break;
+		}
+	}
+	
+@Deprecated	
 	public void process(int input){
 		if(input == -2){
 			if(inputDest)initSpd();
@@ -206,6 +304,7 @@ public class Xmit {
 		else System.out.println("Heading: " + this.heading + "." + this.mark);
 	}
 
+@Deprecated
 	/**
 	 * Sets the destination for input.<br>
 	 * false = heading<br>
@@ -220,6 +319,13 @@ public class Xmit {
 			initHdg();
 	}
 	
+	public void setInputDest(ELEMENT dest){
+		eleDest = dest;
+		if(eleDest == ELEMENT.HUD_OPS_HDG) initHdg();
+		if(eleDest == ELEMENT.HUD_OPS_SPD) initSpd();
+		System.out.println("Element Destination: " + eleDest);
+	}
+	
 	public void setWaypoint(Static waypoint){
 		this.waypoint = waypoint;
 	}
@@ -228,12 +334,19 @@ public class Xmit {
 		inputStatus = 100;
 		heading = headingInit;
 		mark = markInit;
+		for(int i = 0; i < inputAvail.length; i++){
+			inputAvail[i] = false;
+		}
 		updateInpStatus();
 	}
 	
 	private void initSpd(){
 		inputStatus = 100;
 		speed = speedInit;
+		for(int i = 0; i < inputAvail.length; i++){
+			inputAvail[i] = false;
+		}
+		factorSpeed();
 		updateInpStatus();
 	}
 		
@@ -246,62 +359,98 @@ public class Xmit {
 			opsAct[index] = status;
 		}
 	}
-	
+
 	private void updateInpStatus(){
-		switch(inputStatus){
-		case 100:
-			for(int i = 1; i < inputAvail.length; i++){
-				inputAvail[i] = true;
-			}
-			break;
-		case 10:
-			if(inputDest){
-				
-			}
-			else{
+		if(eleDest == ELEMENT.HUD_OPS_HDG){
+			switch(inputStatus){
+			case 100:
+				inputAvail[1] = true;
+				inputAvail[2] = true;
+				inputAvail[3] = true;
+				inputAvail[10] = true;
+				inputAvail[11] = true;
+				inputAvail[12] = true;
+				break;
+			case 10:
+				inputAvail[4] = true;
+				inputAvail[5] = true;
+				inputAvail[6] = true;
+				inputAvail[7] = true;
+				inputAvail[8] = true;
+				inputAvail[9] = true;
 				if(this.heading >= 300){
-					for(int i = 7; i < 10; i++){
-						inputAvail[i] = false;
-					}
+					inputAvail[6] = false;
+					inputAvail[7] = false;
+					inputAvail[8] = false;
+					inputAvail[9] = false;
 				}
-			}
-			break;
-		case 1:
-			if(inputDest){
-				
-			}
-			else{
-				if(this.heading >= 360){
-					for(int i = 1; i < 10; i++){
-						inputAvail[i] = false;
-					}
-				}
-				else{
-					for(int i = 1; i < 10; i++){
-						inputAvail[i] = true;
-					}
-				}
-			}
-			break;
-		case -100:
-			for(int i = 1; i < inputAvail.length; i++){
-				inputAvail[i] = true;
-			}
-			inputAvail[ELEMENT.HUD_INP_MRK.getIndex()] = false;
-			break;
-		case -10:
-			if(this.mark >= 100){
-				inputAvail[ELEMENT.HUD_INP_NIN.getIndex()] = false;
-			}
-			break;
-		case -1:
-			inputAvail[ELEMENT.HUD_INP_NIN.getIndex()] = true;
-			if(this.mark >= 180){
-				for(int i = 1; i < 10; i++){
+				break;
+			case 1:
+				inputAvail[6] = true;
+				inputAvail[7] = true;
+				inputAvail[8] = true;
+				inputAvail[9] = true;
+				break;
+			case -100:
+				for(int i = 0; i < inputAvail.length; i++){
 					inputAvail[i] = false;
 				}
+				inputAvail[1] = true;
+				inputAvail[11] = true;
+				inputAvail[12] = true;
+				break;
+			case -10:
+				for(int i = 0; i < 10; i++){
+					inputAvail[i] = true;
+				}
+				if(this.mark >= 100){
+					inputAvail[9] = false;
+				}
+				inputAvail[10] = false;
+				break;
+			case -1:
+				for(int i = 0; i < inputAvail.length; i++){
+					inputAvail[i] = true;
+				}
+				inputAvail[10] = false;
+				if(this.mark >= 180){
+					for(int i = 0; i < 10; i++){
+						inputAvail[i] = false;
+					}
+				}
+				break;
 			}
-			break;
+		}
+		if(eleDest == ELEMENT.HUD_OPS_SPD){
+			inputAvail[11] = true;
+			inputAvail[12] = true;
+			switch(inputStatus){
+			case 100:
+				for(byte i = 1; i <= speedFactor[0]; i++){
+					inputAvail[i] = true;
+				}
+				break;
+			case 10:
+				for(byte i = 1; i < 10; i++){
+					inputAvail[i] = true;
+				}
+				if(this.speed == speedFactor[0] * 100){
+					for(byte i = 9; i > speedFactor[1]; i--){
+						inputAvail[i] = false;
+					}
+				}
+				break;
+			case 1:
+				for(byte i = 1; i < 10; i++){
+					inputAvail[i] = true;
+				}
+				if(this.speed == (speedFactor[0] * 100) + (speedFactor[1] * 10)){
+					for(byte i = 9; i > speedFactor[2]; i--){
+						inputAvail[i] = false;
+					}
+				}
+				break;
+			}
 		}
 	}
 	

@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
-import java.awt.geom.Line2D;
 import java.util.Vector;
 
 import ss.StarSector;
@@ -135,11 +134,16 @@ public class Mobile extends Entity{
 			turn();
 		}
 		if(mobOpsAct[ELEMENT.HUD_OPS_APR.getIndex()]){
-			if(Calc.doesIntersect(loc, dir, origin.getArriveCoords(), origin.getLoc())){
+			if(Calc.doesIntersect(loc, dir, destination.getArriveCoords(), destination.getLoc())){
 				System.out.println("Calc.doesIntersect() returned true.");
-				Coords intcpt = Calc.intersection(loc, dir, origin.getLoc(), origin.getArriveCoords());
+				Coords intcpt = Calc.intersection(loc, dir, destination.getLoc(), destination.getArriveCoords());
 				if(intcpt != null){
 					System.out.println("Mobile intercepts localizer at Coords: " + intcpt.GetX() + ", " + intcpt.GetY() + ", " + intcpt.GetZ());
+					int angle = (int)Calc.approachAngle(destination.getLoc(), intcpt, loc);
+					if(angle <= 225 && angle >= 135){
+						System.out.println("Established on localizer.");
+						setFlightStatus(FSTATUS.ONAPR);
+					}
 				}
 			}
 		}
@@ -244,6 +248,7 @@ public class Mobile extends Entity{
 	public void setFlightStatus(FSTATUS status){
 		this.status = status;
 		canSelect = status.canSelect();
+		if(this.isSelected) this.deselect();
 	}
 	
 	public void setOps(int i, boolean value){

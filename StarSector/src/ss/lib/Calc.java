@@ -20,6 +20,7 @@ public class Calc {
 		
 		double B = (a*a + c*c - b*b) / (2*a*c);
 		double alpha = (Math.acos(B));
+		System.out.println("Current interception angle: " + Math.toDegrees(alpha));
 		return Math.toDegrees(alpha);
 	}
 	
@@ -174,6 +175,10 @@ public class Calc {
 
 		System.out.println("PA: " + pa.GetX() + ", " + pa.GetY() + ", " + pa.GetZ());
 		System.out.println("PB: " + pb.GetX() + ", " + pb.GetY() + ", " + pb.GetZ());
+		if(pa.GetX() == pb.GetX() && pa.GetY() == pb.GetY() && pa.GetZ() == pb.GetZ()){
+			System.out.println("Absolute intersection found.");
+			return pa;
+		}
 		return null;
 	}
 	
