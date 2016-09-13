@@ -44,6 +44,7 @@ public class Hud implements MouseMotionListener, MouseListener {
 	 * Vector containing all of the HudElements that comprise the numeric Hud input display.
 	 */
 	private Vector<HudElement> inputElements = new Vector<HudElement>();
+	private Vector<HudElement> listElements = new Vector<HudElement>();
 	private Vector<HudElement> menuElements = new Vector<HudElement>();
 	/**
 	 * Vector containing all of the HudElements that comprise the Hud operations display.
@@ -55,8 +56,12 @@ public class Hud implements MouseMotionListener, MouseListener {
 	
 	public Hud(){
 		for(ELEMENT e : ELEMENT.values()){
-			HudElement temp = new HudElement(this, e);
+//			HudElement temp = new HudElement(this, e);
+			HudElement temp = new HudElement(e);
 			switch(e.getMode()){
+			case LIST:
+				listElements.addElement(temp);
+				break;
 			case INPUT:
 				inputElements.addElement(temp);
 				break;
@@ -109,6 +114,13 @@ public class Hud implements MouseMotionListener, MouseListener {
 		switch(arg0.getButton()){
 		case MouseEvent.BUTTON1:
 			switch(hudMode){
+			case LIST:
+				for(int i = 1; i < listElements.size(); i++){
+					if(listElements.get(i).wasClicked(arg0.getX(), arg0.getY())){
+						hudProcess(listElements.get(i));
+					}
+				}
+				break;
 			case MENU:
 				for(int i = 0; i < menuElements.size(); i++){
 					if(menuElements.get(i).wasClicked(arg0.getX(), arg0.getY())){
@@ -175,6 +187,12 @@ public class Hud implements MouseMotionListener, MouseListener {
 	// Render Contextual UI (if applicable)
 	public void Render(Graphics G){
 		switch(hudMode){
+		case LIST:
+			Tracon.Render(G, hudPerspective);
+			renderBaseHud(G);
+			renderOps(G);
+			renderList(G);
+			break;
 		case INPUT:
 			Tracon.Render(G, hudPerspective);
 			renderBaseHud(G);
@@ -204,14 +222,22 @@ public class Hud implements MouseMotionListener, MouseListener {
 	
 	private void hudProcess(HudElement element){
 		switch(element.getElementResponse()){
+		case ACPT:
+			xmit.setWaypoint();
+			hudMode = HUDMODE.OPS;
+			break;
 		case APRCLR:
 			if(selectedMobile.getOps(ELEMENT.HUD_OPS_APR.getIndex()))
 				xmit.setOpsActive(ELEMENT.HUD_OPS_APR.getIndex(), !xmit.getOpsActive(ELEMENT.HUD_OPS_APR.getIndex()));
 			break;
 		case CNCL:
-			if(inputElements.get(ELEMENT.HUD_INP_CAN.getIndex()).isActive()){
-//				xmit.process(-2);	// Deprecated
-				xmit.input(-2);
+			if(hudMode == HUDMODE.INPUT){
+				if(inputElements.get(ELEMENT.HUD_INP_CAN.getIndex()).isActive()){
+					xmit.input(-2);
+					hudMode = HUDMODE.OPS;
+				}
+			}
+			else if(hudMode == HUDMODE.LIST){
 				hudMode = HUDMODE.OPS;
 			}
 			break;
@@ -226,8 +252,12 @@ public class Hud implements MouseMotionListener, MouseListener {
 			hudMode = HUDMODE.OVERVIEW;
 			break;
 		case DCT:
-			if(selectedMobile.getOps(ELEMENT.HUD_OPS_DCT.getIndex()))
-				xmit.setOpsActive(ELEMENT.HUD_OPS_DCT.getIndex(), !xmit.getOpsActive(ELEMENT.HUD_OPS_DCT.getIndex()));
+//			if(selectedMobile.getOps(ELEMENT.HUD_OPS_DCT.getIndex()))
+//				xmit.setOpsActive(ELEMENT.HUD_OPS_DCT.getIndex(), !xmit.getOpsActive(ELEMENT.HUD_OPS_DCT.getIndex()));
+			if(selectedMobile.getOpsActive(ELEMENT.HUD_OPS_DCT.getIndex()))
+				xmit.setOpsActive(ELEMENT.HUD_OPS_DCT.getIndex(), false);
+			else
+				hudMode = HUDMODE.LIST;
 			break;
 		case EXIT:
 			StarSector.exit();
@@ -260,8 +290,14 @@ public class Hud implements MouseMotionListener, MouseListener {
 				StarSector.setPause(false);
 			}
 			break;
+		case NEXT:
+			xmit.nextWaypt();
+			break;
 		case NULL:
 			System.out.println("WARN: NULL PROCESSED");
+			break;
+		case PREV:
+			xmit.prevWaypt();
 			break;
 		case SPD:
 			if(selectedMobile.getOps(ELEMENT.HUD_OPS_SPD.getIndex())){
@@ -469,6 +505,17 @@ public class Hud implements MouseMotionListener, MouseListener {
 		G.setColor(PrevC);
 	}
 	
+	private void renderList(Graphics G){
+		Color PrevC = G.getColor();
+		Draw.shape(G, listElements.get(0).getElementArea(), 1, Color.darkGray, Color.black);
+		for(int i = 1; i < listElements.size(); i++){
+			Draw.shape(G, listElements.get(i).getElementArea(), 1, Color.green, Color.darkGray);
+			G.setColor(Color.green);
+			Text.BoxText(G, Fonts.HudText, listElements.get(i).getElementArea(), Text.alignCenter(), Text.alignMiddle(), listElements.get(i).getElementResponse().getText());
+		}
+		G.setColor(PrevC);
+	}
+	
 	private void renderMainMenu(Graphics G){
 		Color prevC = G.getColor();
 		Font prevF = G.getFont();
@@ -557,6 +604,11 @@ public class Hud implements MouseMotionListener, MouseListener {
 				G.setColor(Color.cyan);
 				Text.BoxText(G, Fonts.HudText, staElements.get(i).getElementArea(), Text.alignLeft(), Text.alignMiddle(), "FROM:");
 				Text.BoxText(G, Fonts.HudText, staElements.get(i).getElementArea(), Text.alignRight(), Text.alignMiddle(), selectedMobile.getOrigin().getName());
+				break;
+			case HUD_STA_TO:
+				G.setColor(Color.cyan);
+				Text.BoxText(G, Fonts.HudText, staElements.get(i).getElementArea(), Text.alignLeft(), Text.alignMiddle(), "TO:");
+				Text.BoxText(G, Fonts.HudText, staElements.get(i).getElementArea(), Text.alignRight(), Text.alignMiddle(), selectedMobile.getDestination().getName());
 				break;
 			default:
 				break;

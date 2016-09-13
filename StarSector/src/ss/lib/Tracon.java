@@ -24,10 +24,10 @@ public class Tracon {
 	private static int arrivalRate = 1;
 	private static int departRate = 1;
 	
-	private static long TOLA	= 0;	//	Time Of Last Arrival
-	private static long TOLD	= 0;	//	Time Of Last Departure
-	private static long TSLA	= 0;	//	Time Since Last Arrival
-	private static long TSLD 	= 0;	//	Time Since Last Departure
+	private static long TOLA	= 0;	//	Time Of Last Arrival		[in millis]
+	private static long TOLD	= 0;	//	Time Of Last Departure		[in millis]
+	private static long TSLA	= 0;	//	Time Since Last Arrival		[in millis]
+	private static long TSLD 	= 0;	//	Time Since Last Departure	[in millis]
 	
 	public static void initTracon(){
 		if(Mobiles.size() > 0){
@@ -40,6 +40,7 @@ public class Tracon {
 				Statics.pop();
 			}
 		}
+		TOLA = TOLD = TSLA = TSLD = 0;
 	}
 	
 	public static void addMobile(Mobile m){
@@ -69,6 +70,16 @@ public class Tracon {
 		return dest;
 	}
 	
+	public static Vector<Static> getWaypoints(){
+		Vector<Static> w = new Vector<Static>();
+		for(int i = 0; i < Statics.size(); i++){
+			if(((Static)Statics.get(i)).getSTYPE() == STYPE.FIX){
+				w.add((Static)Statics.get(i));
+			}
+		}
+		return w;
+	}
+	
 	public static boolean loadSave(){
 		initTracon();
 		return true;
@@ -80,49 +91,6 @@ public class Tracon {
 		xmlp.parseXmlFile();
 		xmlp.parseDocument();
 		return true;
-	}
-	
-	@Deprecated
-	/**
-	 * Selects and returns an entity at the specified MouseEvent coordinates.
-	 * @param arg0	MouseEvent
-	 * @return
-	 */
-	public static Entity selectEntityAt(MouseEvent arg0){
-		double x,y;
-		for(int i = 0; i < Statics.size(); i++){
-			Entity Temp = Statics.get(i);
-			x = Temp.loc.GetX();
-			if(Hud.getP()) y = Temp.loc.GetY();
-			else y = Temp.loc.GetZ();
-			if(x - (StarSector.SPRITEWIDTH / 2) <= arg0.getX() && x + (StarSector.SPRITEWIDTH / 2) >= arg0.getX() &&
-				y - (StarSector.SPRITEHEIGHT / 2) <= arg0.getY() && y + (StarSector.SPRITEHEIGHT / 2) >= arg0.getY()){
-				if(Temp.canSelect){
-					Temp.select();
-					return Temp;
-				}
-			}
-			else{
-				Temp.deselect();
-			}
-		}
-		for(int i = 0; i < Mobiles.size(); i++){
-			Entity Temp = Mobiles.get(i);
-			x = Temp.loc.GetX();
-			if(Hud.getP()) y = Temp.loc.GetY();
-			else y = Temp.loc.GetZ();
-			if(x - (StarSector.SPRITEWIDTH / 2) <= arg0.getX() && x + (StarSector.SPRITEWIDTH / 2) >= arg0.getX() &&
-					y - (StarSector.SPRITEHEIGHT / 2) <= arg0.getY() && y + (StarSector.SPRITEHEIGHT / 2) >= arg0.getY()){
-				if(Temp.canSelect){
-					Temp.select();
-					return Temp;
-				}
-			}
-			else{
-				Temp.deselect();
-			}
-		}
-		return null;
 	}
 	
 	/**

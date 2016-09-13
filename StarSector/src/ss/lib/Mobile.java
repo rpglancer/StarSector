@@ -121,10 +121,10 @@ public class Mobile extends Entity{
 		if(canSelect) isSelected = true;
 	}
 	
-	@Override
-	public void setLoc(double x, double y, double z){
-		this.loc.SetCoords(x, y, z);
-	}
+//	@Override
+//	public void setLoc(double x, double y, double z){
+//		this.loc.SetCoords(x, y, z);
+//	}
 	
 	@Override
 	public void tick(){
@@ -146,6 +146,10 @@ public class Mobile extends Entity{
 					}
 				}
 			}
+		}
+		if(mobOpsAct[ELEMENT.HUD_OPS_DCT.getIndex()] && waypoint != null){
+			this.hdgDesired = Calc.convertCoordsToHdg(loc, waypoint.loc);
+			this.mkDesired = Calc.convertCoordsToMk(loc, waypoint.loc);
 		}
 		loc.add(Calc.mVector(this));
 		dir = Calc.dVector(this, Hud.getTimeProject());
@@ -171,6 +175,10 @@ public class Mobile extends Entity{
 	
 	public Static getOrigin(){
 		return origin;
+	}
+	
+	public Static getDestination(){
+		return destination;
 	}
 	
 	public double getHdg(){

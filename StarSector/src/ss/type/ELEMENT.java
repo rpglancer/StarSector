@@ -40,8 +40,15 @@ public enum ELEMENT {
 	HUD_INP_NIN		(9, HUDMODE.INPUT, 	RESPONSE.NINE,		Color.darkGray, Color.green,	HUD_INP_EIG.getX() + 40, HUD_INP_EIG.getY(), 32, 16),
 	HUD_INP_MRK		(10, HUDMODE.INPUT, RESPONSE.MARK,		Color.darkGray, Color.green,	HUD_INP.getX() + 8, HUD_INP_SEV.getY() + 24, 32, 16),
 	HUD_INP_ZER		(11,HUDMODE.INPUT, 	RESPONSE.ZER,		Color.darkGray, Color.green,	HUD_INP_MRK.getX() + 40, HUD_INP_MRK.getY(), 32, 16),
-	HUD_INP_CAN		(12, HUDMODE.INPUT, RESPONSE.CNCL,		Color.darkGray, Color.green,	HUD_INP_ZER.getX() + 40, HUD_INP_MRK.getY(), 32, 16);
-	//HUD_INP_ACP		(13, HUDMODE.INPUT, RESPONSE.ACPT,		Color.darkGray, Color.green,	HUD_INP.getX() + 8, HUD_INP_SEV.getY() + 24, 32, 16);
+	HUD_INP_CAN		(12, HUDMODE.INPUT, RESPONSE.CNCL,		Color.darkGray, Color.green,	HUD_INP_ZER.getX() + 40, HUD_INP_MRK.getY(), 32, 16),
+	HUD_LST			(0,	HUDMODE.LIST,	RESPONSE.NULL,		Color.darkGray,	Color.green,	HUD_OPS.getX() + HUD_OPS.getW(), HUD_OPS.getY(), 128, 104),
+	HUD_LST_WPT		(1, HUDMODE.LIST,	RESPONSE.WAYPT,		Color.darkGray,	Color.green,	HUD_LST.getX() + 8, HUD_LST.getY()+20,112,16),
+	HUD_LST_PRV		(2, HUDMODE.LIST,	RESPONSE.PREV,		Color.darkGray, Color.green,	HUD_LST.getX() + 8, HUD_LST_WPT.getY() + 24,32,16),
+	HUD_LST_NXT		(3, HUDMODE.LIST,	RESPONSE.NEXT,		Color.darkGray, Color.green,	HUD_LST.getX() + HUD_LST.getW() - 40, HUD_LST_PRV.getY(),32,16),
+	HUD_LST_ACC		(4, HUDMODE.LIST,	RESPONSE.ACPT,		Color.darkGray, Color.green,	HUD_LST.getX() + 8, HUD_LST_PRV.getY() + 24,32,16),
+	HUD_LST_CAN		(5, HUDMODE.LIST,	RESPONSE.CNCL,		Color.darkGray, Color.green,	HUD_LST.getX() + HUD_LST.getW() - 40, HUD_LST_ACC.getY(),32,16),
+	
+	;
 	
 	private int i;
 	private int x;

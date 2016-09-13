@@ -2,7 +2,6 @@ package ss.lib;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Rectangle;
 import java.util.Vector;
 
 import ss.StarSector;
@@ -68,11 +67,10 @@ public class Static extends Entity {
 		// TODO Auto-generated method stub
 	}
 
-	@Override
-	public void setLoc(double x, double y, double z) {
-		// TODO Auto-generated method stub
-		
-	}
+//	@Override
+//	public void setLoc(double x, double y, double z) {
+//		// TODO Auto-generated method stub	
+//	}
 	
 	@Override
 	public void render(Graphics g, boolean p){

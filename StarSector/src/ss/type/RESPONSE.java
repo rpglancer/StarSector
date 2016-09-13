@@ -40,7 +40,11 @@ public enum RESPONSE {
 	ORIGIN	("Origin:",	Color.green, Color.green),
 	DEST	("Dest.:",	Color.green, Color.green),
 	CURRENT	("Current", Color.green, Color.green),
-	DESIRED ("Desired", Color.green, Color.green);
+	DESIRED ("Desired", Color.green, Color.green),
+	WAYPT	("", 		Color.green, Color.darkGray),
+	PREV	("PRV",		Color.green, Color.darkGray),
+	NEXT	("NXT",		Color.green, Color.darkGray)
+	;
 	
 	private String text;
 	private Color primary;
@@ -50,6 +54,10 @@ public enum RESPONSE {
 		this.text = text;
 		this.primary = primary;
 		this.secondary = secondary;
+	}
+	
+	public void setText(String text){
+		this.text = text;
 	}
 	
 	public String getText(){

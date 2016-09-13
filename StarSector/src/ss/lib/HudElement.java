@@ -8,21 +8,21 @@ import ss.type.HUDMODE;
 import ss.type.RESPONSE;
 
 public class HudElement {
-	private static Hud elementHud;				//	The hud element manager
+//	private static Hud elementHud;				//	The hud element manager [wtf is this for?]
 	private boolean isActive = false;			//	Is this element available for interaction?
 	private boolean isBlinking = false;			//	Is this element blinking?
 	private int blinkRate = 0;					//	For managing the blink rate
 	private Rectangle elementArea;				//	This element's area
 	private ELEMENT	element;					//	The element information
-	
-//	@Deprecated
-//	public HudElement(Hud hud, Rectangle area, HUDMODE mode, RESPONSE response){
-//		if(elementHud == null) elementHud = hud;
-//		this.elementArea = area;
-//	}
-	
+
+@Deprecated
 	public HudElement(Hud hud, ELEMENT e){
-		if(elementHud == null) elementHud = hud;
+//		if(elementHud == null) elementHud = hud;	[unnecessary?]
+		elementArea = new Rectangle(e.getX(), e.getY(), e.getW(), e.getH());
+		element = e;
+	}
+	
+	public HudElement(ELEMENT e){
 		elementArea = new Rectangle(e.getX(), e.getY(), e.getW(), e.getH());
 		element = e;
 	}
@@ -97,29 +97,8 @@ public class HudElement {
 		return elementArea;
 	}
 	
-//	@Deprecated
-//	public int getX(){
-//		return elementArea.x;
-//	}
-	
-//	@Deprecated
-//	public int getY(){
-//		return elementArea.y;
-//	}
-	
-//	@Deprecated
-//	public int getHeight(){
-//		return elementArea.height;
-//	}
-	
-//	@Deprecated
-//	public int getWidth(){
-//		return elementArea.width;
-//	}
-	
 	public void setElementResponse(RESPONSE response){
 		element.setResponse(response);
-//		elementResponse = response;
 	}
 	
 	/**

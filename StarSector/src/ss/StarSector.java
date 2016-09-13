@@ -41,7 +41,7 @@ public class StarSector extends Canvas implements Runnable{
 	
 	private static final int VER_MAJOR = 0;
 	private static final int VER_MINOR = 1;
-	private static final int VER_REV = 1;
+	private static final int VER_REV = 2;
 	private static final String VER_REL = "p";
 	
 	private Hud hud;

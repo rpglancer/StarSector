@@ -1,5 +1,7 @@
 package ss.lib;
 
+import java.util.Vector;
+
 import ss.type.ELEMENT;
 
 /**
@@ -16,6 +18,9 @@ public class Xmit {
 	private int speedInit;
 	private int speedMax;
 	private byte[] speedFactor = {0,0,0};
+	
+	private static Vector<Static> waypointsAvailable;
+	private static int waypointsIndex = 0;
 	
 	/**
 	 * Tracks and manages the status of input submitted via the Hud input.<br>
@@ -73,6 +78,9 @@ public class Xmit {
 		for(int i = 0; i < opsAct.length; i++){
 			opsAct[i] = m.getOpsActive(i);
 		}
+		waypointsAvailable = Tracon.getWaypoints();
+		if(waypointsAvailable.size() > 0)
+			ELEMENT.HUD_LST_WPT.getResponse().setText(waypointsAvailable.get(waypointsIndex).getName());
 		waypoint = m.getWaypoint();
 	}
 	
@@ -304,6 +312,20 @@ public class Xmit {
 		else System.out.println("Heading: " + this.heading + "." + this.mark);
 	}
 
+	public void nextWaypt(){
+		if(waypointsIndex == waypointsAvailable.size() - 1)
+			waypointsIndex = 0;
+		else
+			waypointsIndex++;
+	}
+	
+	public void prevWaypt(){
+		if(waypointsIndex == 0)
+			waypointsIndex = waypointsAvailable.size() - 1;
+		else
+			waypointsIndex--;
+	}
+
 @Deprecated
 	/**
 	 * Sets the destination for input.<br>
@@ -325,9 +347,15 @@ public class Xmit {
 		if(eleDest == ELEMENT.HUD_OPS_SPD) initSpd();
 		System.out.println("Element Destination: " + eleDest);
 	}
-	
+
+@Deprecated
 	public void setWaypoint(Static waypoint){
 		this.waypoint = waypoint;
+	}
+
+	public void setWaypoint(){
+		this.waypoint = waypointsAvailable.get(waypointsIndex);
+		opsAct[ELEMENT.HUD_OPS_DCT.getIndex()] = true;
 	}
 	
 	private void initHdg(){

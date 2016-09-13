@@ -5,5 +5,6 @@ public enum HUDMODE {
 	OVERVIEW,
 	OPS,
 	STA,
-	INPUT;
+	INPUT,
+	LIST;
 }
