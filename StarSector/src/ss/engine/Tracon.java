@@ -55,22 +55,35 @@ public class Tracon {
 	public static void addStatic(Static s){
 		Statics.push(s);
 	}
+		
+//	@Deprecated
+//	public static Static getDestination(Static origin){
+//		if(Statics.size() < 2) return null;
+//		Random rand = new Random();
+//		rand.setSeed(System.currentTimeMillis());
+//		Static dest;
+//		do{
+//			dest = (Static)Statics.get(rand.nextInt(Statics.size()));
+//		}while(dest == origin);
+//		return dest;
+//	}
 	
-	public static int getArrivalRate(){
-		return arrivalRate;
-	}
-	
-	public static int getDepartRate(){
-		return departRate;
-	}
-	
-	public static Static getDestination(Static origin){
-		if(Statics.size() < 2) return null;
+	public static Static assignDestination(Static origin){
+		if(Statics.size() < 2){
+			System.out.println("WARN: Cannot assign destination due to isufficient pool");
+			return null;
+		}
+		Vector<Static> avail = new Vector<Static>();
+		for(int i = 0; i < Statics.size(); i++){
+			Static temp = (Static)Statics.get(i);
+			if(temp.getSTYPE() == STYPE.GATE || temp.getSTYPE() == STYPE.STATION)
+				avail.add(temp);
+		}
+		Static dest;
 		Random rand = new Random();
 		rand.setSeed(System.currentTimeMillis());
-		Static dest;
 		do{
-			dest = (Static)Statics.get(rand.nextInt(Statics.size()));
+			dest = (Static)avail.get(rand.nextInt(avail.size()));
 		}while(dest == origin);
 		return dest;
 	}
@@ -117,16 +130,16 @@ public class Tracon {
 		}
 	}
 	
-	@Deprecated
-	public static Vector<Static> getWaypoints(){
-		Vector<Static> w = new Vector<Static>();
-		for(int i = 0; i < Statics.size(); i++){
-			if(((Static)Statics.get(i)).getSTYPE() == STYPE.FIX){
-				w.add((Static)Statics.get(i));
-			}
-		}
-		return w;
-	}
+//	@Deprecated
+//	public static Vector<Static> getWaypoints(){
+//		Vector<Static> w = new Vector<Static>();
+//		for(int i = 0; i < Statics.size(); i++){
+//			if(((Static)Statics.get(i)).getSTYPE() == STYPE.FIX){
+//				w.add((Static)Statics.get(i));
+//			}
+//		}
+//		return w;
+//	}
 	
 	public static boolean loadSave(){
 		initTracon();
@@ -170,14 +183,6 @@ public class Tracon {
 		}
 	}
 	
-	public static void setDepartRate(int rate){
-		departRate = rate;
-	}
-	
-	public static void setArrivalRate(int rate){
-		arrivalRate = rate;
-	}
-	
 	public static void pushChatter(String msg){
 		Chatter chat = new Chatter(msg);
 		if(chatterQueue.size() < 1) chat.makeCurrent();
@@ -218,11 +223,14 @@ public class Tracon {
 		}
 	}
 	
+	/**
+	 * Add a mobile arriving at the sector via a GATE.
+	 */
 	private static void addArrival(){
 		Vector<Static> as = new Vector<Static>();
 		for(int i = 0; i < Statics.size(); i++){
 			Static s = (Static)Statics.get(i);
-			if(s.getSTYPE() == STYPE.GATE && s.availableForRelease(getArrivalRate())){
+			if(s.getSTYPE() == STYPE.GATE && s.availableForRelease(arrivalRate)){
 				as.add(s);
 			}
 		}
@@ -236,6 +244,9 @@ public class Tracon {
 		}
 	}
 	
+	/**
+	 * Add a mobile departing a station for a GATE or other STATION.
+	 */
 	private static void addDeparture(){
 	}
 	

@@ -41,22 +41,21 @@ public class Hud implements MouseMotionListener, MouseListener {
 	
 	private SimpleDateFormat dateF = new SimpleDateFormat("HH:mm:ss zzz");
 	
-	/**
-	 * Vector containing all of the HudElements that comprise the Hud Overview
-	 */
+	/** Overview elements. */
 	private Vector<HudElement> ovwElements = new Vector<HudElement>();
-	/**
-	 * Vector containing all of the HudElements that comprise the numeric Hud input display.
-	 */
+	/** Input display [ie: 10 key] elements */
 	private Vector<HudElement> inputElements = new Vector<HudElement>();
+	/** List display [ie: APR and DCT] elements */
 	private Vector<HudElement> listElements = new Vector<HudElement>();
+	/** Main Menu Elements */
 	private Vector<HudElement> menuElements = new Vector<HudElement>();
-	/**
-	 * Vector containing all of the HudElements that comprise the Hud operations display.
-	 */
+	/** Operations Elements */
 	private Vector<HudElement> opsElements = new Vector<HudElement>();
+	/** Status Elements */
 	private Vector<HudElement> staElements = new Vector<HudElement>();
+	/** Ruler elements for Y axis. */
 	private Vector<Integer> rulerElementsY = new Vector<Integer>();
+	/** Ruler elements for X axis. */
 	private Vector<Integer> rulerElementsX = new Vector<Integer>();
 	
 	//	Stores 
@@ -271,10 +270,6 @@ public class Hud implements MouseMotionListener, MouseListener {
 			}
 			else
 				hudMode = HUDMODE.LIST;
-//			if(selectedMobile.getOpsActive(ELEMENT.HUD_OPS_DCT.getIndex()))
-//				xmit.setOpsActive(ELEMENT.HUD_OPS_DCT.getIndex(), false);
-//			else
-//				hudMode = HUDMODE.LIST;
 			break;
 		case EXIT:
 			StarSector.exit();

@@ -83,7 +83,8 @@ public class Mobile extends Entity{
 	private Vector<Coords> history = new Vector<Coords>();
 	
 	public Mobile(MTYPE type, Static origin, Static destination){
-		status = FSTATUS.HNDOFF;
+//		status = FSTATUS.HNDOFF;
+		status = FSTATUS.ARIDEP;
 		available = status.canSelect();
 		this.type = type;
 		this.serial = Text.genSerial(this);
@@ -125,11 +126,11 @@ public class Mobile extends Entity{
 		renderFlightInfo(g, p);
 	}
 	
-	@Deprecated
-	@Override
-	public void select(){
-		if(available) selected = true;
-	}
+//	@Deprecated
+//	@Override
+//	public void select(){
+//		if(available) selected = true;
+//	}
 	
 	@Override
 	public Mobile querySelect(int x, int y){
@@ -152,6 +153,10 @@ public class Mobile extends Entity{
 	public void tick(){
 		updateHistory();
 		throttle();
+		if(status == FSTATUS.ARIDEP && speedCurrent == speedMax){
+			status = FSTATUS.HNDOFF;
+			available = FSTATUS.HNDOFF.canSelect();
+		}
 		if(hdgCurrent != hdgDesired || mkCurrent != mkDesired){
 			turn();
 		}
@@ -390,6 +395,9 @@ public class Mobile extends Entity{
 		if(!p) y = (int)loc.GetZ();
 		int x = (int)(loc.GetX() + 8);
 		switch(status){
+		case ARIDEP:
+			G.drawString((int)speedCurrent+"", x, y);
+			break;
 		case CNFLCT:
 			break;
 		case EMGNCY:
@@ -397,14 +405,17 @@ public class Mobile extends Entity{
 		case HNDOFF:
 			G.drawString(serial.substring(3, serial.length()), x, y);
 			y+=fm.getAscent();
-			G.drawString((int)this.getSpd()+"", x, y);
+			G.drawString((int)speedCurrent+"", x, y);
 			break;
 		case MISAPR:
 			break;
 		case NORMAL:
 			G.drawString(name, x, y);
 			y+=fm.getAscent();
-			G.drawString((int)this.getHdg()+"."+(int)this.getMK(), x, y);
+			if(waypoint != null)
+				G.drawString(waypoint.getName(), x, y);
+			else
+				G.drawString((int)this.getHdg()+"."+(int)this.getMK(), x, y);
 			y+=fm.getAscent();
 			G.drawString((int)this.getSpd()+"", x, y);
 			break;
@@ -431,6 +442,9 @@ public class Mobile extends Entity{
 	
 	private void setFlightInfoColor(Graphics G){
 		switch(status){
+		case ARIDEP:
+			G.setColor(Color.magenta);
+			break;
 		case CNFLCT:
 			G.setColor(Color.yellow);
 			break;

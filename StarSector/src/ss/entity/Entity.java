@@ -19,8 +19,8 @@ public abstract class Entity {
 	public abstract boolean isSelected();
 	public abstract void deselect();
 	public abstract Coords getLoc();
-	@Deprecated
-	public abstract void select();
+//	@Deprecated
+//	public abstract void select();
 	public abstract Entity querySelect(int x, int y);
 	public abstract void render(Graphics G, boolean p);
 	public abstract void tick();

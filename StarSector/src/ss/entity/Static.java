@@ -23,8 +23,8 @@ public class Static extends Entity {
 	private long TSLR = 800000;			// Time Since Last Release
 	private long TOLR = 0;				// Time Of Last Release
 	
-	private Coords Arrival;
-	private Coords Departure;
+	private Coords Arrival;				// Approach ILS starting coordinates
+	private Coords Departure;			// Departure line ending coordinates
 	
 	private Vector<Mobile> Queue;
 	
@@ -67,11 +67,6 @@ public class Static extends Entity {
 	@Override
 	public Coords getLoc() {
 		return this.loc;
-	}
-
-	@Override
-	public void select() {
-		// TODO Auto-generated method stub
 	}
 	
 	@Override
@@ -130,7 +125,8 @@ public class Static extends Entity {
 	}
 	
 	public void releaseCraft(){
-		new Mobile(MTYPE.M3, this, Tracon.getDestination(this));
+//		new Mobile(MTYPE.M3, this, Tracon.getDestination(this));
+		new Mobile(MTYPE.M3, this, Tracon.assignDestination(this));
 		TOLR = System.currentTimeMillis();
 	}
 

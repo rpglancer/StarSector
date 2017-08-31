@@ -1,6 +1,7 @@
 package ss.type;
 
 public enum FSTATUS {
+	ARIDEP  (false),
 	HNDOFF	(true),
 	NORMAL	(true),
 	ONAPR	(false),

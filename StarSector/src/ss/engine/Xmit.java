@@ -2,6 +2,7 @@ package ss.engine;
 
 import java.util.Vector;
 
+import ss.engine.Tracon;
 import ss.entity.Mobile;
 import ss.entity.Static;
 import ss.type.ELEMENT;
@@ -13,6 +14,7 @@ import ss.type.STYPE;
  *
  */
 public class Xmit {
+	private byte[] speedFactor = {0,0,0};
 	private int heading;
 	private int headingInit;
 	private int mark;
@@ -20,13 +22,15 @@ public class Xmit {
 	private int speed;
 	private int speedInit;
 	private int speedMax;
-	private byte[] speedFactor = {0,0,0};
+	
 	
 	private Mobile mobile;
+	private Static waypoint;
+	private Static waypointInit;
 	
 	private Vector<Static> approachesAvailable;
 	private Vector<Static> waypointsAvailable;
-	private static int waypointsIndex = 0;
+	private static int waypointsIndex = 0;		// Not sure why this would need to be static.
 	
 	/**
 	 * Tracks and manages the status of input submitted via the Hud input.<br>
@@ -63,8 +67,6 @@ public class Xmit {
 									 false, false, false,
 									 false, false, false,
 									 false };
-	private Static waypoint;
-	private Static waypointInit;
 	
 	/**
 	 * Create a new transmission order to be broadcast to a Mobile.
