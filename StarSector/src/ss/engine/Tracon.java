@@ -1,4 +1,4 @@
-package ss.lib;
+package ss.engine;
 
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
@@ -6,7 +6,10 @@ import java.util.LinkedList;
 import java.util.Random;
 import java.util.Vector;
 
-import ss.StarSector;
+import ss.entity.Entity;
+import ss.entity.Mobile;
+import ss.entity.Static;
+import ss.type.MTYPE;
 import ss.type.STYPE;
 import ss.util.XMLParser;
 
@@ -20,6 +23,8 @@ public class Tracon {
 
 	private static LinkedList<Entity> Mobiles = new LinkedList<Entity>();
 	private static LinkedList<Entity> Statics = new LinkedList<Entity>();
+	
+	private static Vector<Chatter> chatterQueue = new Vector<Chatter>();
 	
 	private static int arrivalRate = 1;
 	private static int departRate = 1;
@@ -70,6 +75,49 @@ public class Tracon {
 		return dest;
 	}
 	
+	/**
+	 * Creates a vector of the specified type of Mobiles.
+	 * A
+	 * @param ofType MTYPE of Mobile of null for all.
+	 * @return Vector of Mobile of MTYPE
+	 */
+	public static Vector<Mobile> getMobiles(MTYPE ofType){
+		Vector<Mobile> m = new Vector<Mobile>();
+		if(ofType == null){
+			for(int i = 0; i < Mobiles.size(); i++){
+				m.add((Mobile)Mobiles.get(i));
+			}
+			return m;
+		}
+		else{
+			for(int i = 0; i < Mobiles.size(); i++){
+				Mobile temp = (Mobile)Mobiles.get(i);
+				if(temp.getMType() == ofType)
+					m.add(temp);
+			}
+			return m;
+		}
+	}
+	
+	public static Vector<Static> getStatics(STYPE ofType){
+		Vector<Static> s = new Vector<Static>();
+		if(ofType == null){
+			for(int i = 0; i < Statics.size(); i++){
+				s.add((Static)Statics.get(i));
+			}
+			return s;
+		}
+		else{
+			for(int i = 0; i < Statics.size(); i++){
+				Static temp = (Static)Statics.get(i);
+				if(temp.getSTYPE() == ofType)
+					s.add(temp);
+			}
+			return s;
+		}
+	}
+	
+	@Deprecated
 	public static Vector<Static> getWaypoints(){
 		Vector<Static> w = new Vector<Static>();
 		for(int i = 0; i < Statics.size(); i++){
@@ -99,24 +147,13 @@ public class Tracon {
 	 * @return
 	 */
 	public static Mobile selectMobileAt(MouseEvent arg0){
-		double x,y;
+		double x = arg0.getX();
+		double y = arg0.getY();
+		Mobile temp = null;
 		for(int i = 0; i < Mobiles.size(); i++){
-			Mobile Temp = (Mobile)Mobiles.get(i);
-			x = Temp.loc.GetX();
-			if(Hud.getP()) y = Temp.loc.GetY();
-			else y = Temp.loc.GetZ();
-			if(x - (StarSector.SPRITEWIDTH / 2) <= arg0.getX() && x + (StarSector.SPRITEWIDTH / 2) >= arg0.getX() &&
-					y - (StarSector.SPRITEHEIGHT / 2) <= arg0.getY() && y + (StarSector.SPRITEHEIGHT / 2) >= arg0.getY()){
-				if(Temp.canSelect){
-					Temp.select();
-					return Temp;
-				}
-			}
-			else{
-				Temp.deselect();
-			}
+			if((Mobile)Mobiles.get(i).querySelect((int)x, (int)y) != null) temp = (Mobile)Mobiles.get(i).querySelect((int)x, (int)y);
 		}
-		return null;
+		return temp;
 	}
 	
 	/**
@@ -141,6 +178,19 @@ public class Tracon {
 		arrivalRate = rate;
 	}
 	
+	public static void pushChatter(String msg){
+		Chatter chat = new Chatter(msg);
+		if(chatterQueue.size() < 1) chat.makeCurrent();
+		chatterQueue.addElement(chat);
+	}
+	
+	public static Chatter currentChatter(){
+		if(chatterQueue.size() > 0)
+			return chatterQueue.get(0);
+		else
+			return null;
+	}
+	
 	/**
 	 * Causes all Entity currently being managed by Tracon to update.
 	 */
@@ -158,6 +208,13 @@ public class Tracon {
 		}
 		for(int i = 0; i < Mobiles.size(); i++){
 			Mobiles.get(i).tick();
+		}
+		if(chatterQueue.size() > 0){
+			if(chatterQueue.get(0).timeToDie(5000)){
+//				System.out.println("CHATTER REMOVED\n");
+				chatterQueue.remove(0);
+				if(chatterQueue.size() > 0) chatterQueue.get(0).makeCurrent();
+			}
 		}
 	}
 	

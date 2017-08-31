@@ -1,8 +1,11 @@
-package ss.lib;
+package ss.engine;
 
 import java.util.Vector;
 
+import ss.entity.Mobile;
+import ss.entity.Static;
 import ss.type.ELEMENT;
+import ss.type.STYPE;
 
 /**
  * Xmit contains the temporary data waiting to be transmitted as an order to a Mobile.
@@ -19,7 +22,10 @@ public class Xmit {
 	private int speedMax;
 	private byte[] speedFactor = {0,0,0};
 	
-	private static Vector<Static> waypointsAvailable;
+	private Mobile mobile;
+	
+	private Vector<Static> approachesAvailable;
+	private Vector<Static> waypointsAvailable;
 	private static int waypointsIndex = 0;
 	
 	/**
@@ -34,6 +40,11 @@ public class Xmit {
 	 */
 	private int inputStatus;
 	
+	/**
+	 * UNUSED, HEADING, SPEED,
+	 * HOLD, DIRECT, APPROACH,
+	 * XMIT, DISREG, CONTACT
+	 */
 	private boolean[] opsAct = 		{false, false, false,
 									 false, false, false,
 									 false, false, false};
@@ -52,40 +63,30 @@ public class Xmit {
 									 false, false, false,
 									 false, false, false,
 									 false };
-	/**
-	 * The destination for numeric input to be applied.<br>
-	 * <b>true</b>: speed<br>
-	 * <b>false</b>: heading<br>
-	 */
-	private boolean inputDest = false;
-	
-	private ELEMENT eleDest;
-	
 	private Static waypoint;
+	private Static waypointInit;
 	
 	/**
 	 * Create a new transmission order to be broadcast to a Mobile.
 	 * @param m The mobile for which the order applies.
 	 */
 	public Xmit(Mobile m){
+		mobile = m;
 		headingInit = (int)m.getHdg();
 		markInit = (int)m.getMK();
 		speedInit = (int)m.getSpd();
 		speedMax = (int)m.getSpdMax();
+		waypointInit = m.getWaypoint();
 		heading = headingInit;
 		mark = markInit;
 		speed = speedInit;
+		waypoint = waypointInit;
 		for(int i = 0; i < opsAct.length; i++){
 			opsAct[i] = m.getOpsActive(i);
 		}
-		waypointsAvailable = Tracon.getWaypoints();
+		waypointsAvailable = Tracon.getStatics(STYPE.FIX);
 		if(waypointsAvailable.size() > 0)
 			ELEMENT.HUD_LST_WPT.getResponse().setText(waypointsAvailable.get(waypointsIndex).getName());
-		waypoint = m.getWaypoint();
-	}
-	
-	public int getHeading(){
-		return heading;
 	}
 	
 	/**
@@ -97,12 +98,8 @@ public class Xmit {
 		return inputAvail[index];
 	}
 	
-	/**
-	 * Allows the current inputStatus to be queried by external methods [ie: the hud].
-	 * @return The current {@link Xmit#inputStatus}
-	 */
-	public int getInputStatus(){
-		return inputStatus;
+	public boolean inputComplete(){
+		return inputStatus == 0;
 	}
 	
 	/**
@@ -114,14 +111,15 @@ public class Xmit {
 		return opsAct[index];
 	}
 	
-	public int getMark(){
-		return mark;
-	}
-	
-	public int getSpd(){
-		return speed;
-	}
-	
+	/**
+	 * A somewhat obtuse method, the purpose of which is to retrieve the maximum speed
+	 * of a given mobile and break it down into a byte array of hundreds, tens and ones
+	 * for determining which numbers are available to the HUD for assigning speeds.<br>
+	 * <br>
+	 * speedFactor[0] = Hundreds<br>
+	 * speedFactor[1] = Tens<br>
+	 * speedFactor[2] = Ones<br>
+	 */
 	private void factorSpeed(){
 		int s = 0;
 		byte c = 0;
@@ -131,28 +129,22 @@ public class Xmit {
 		speedFactor[1] = c;
 		for(c = 0; s > 0; s-=1, c++);
 		speedFactor[2] = c;
-//		System.out.println("Factored Speed: " + speedFactor[0] + "," +speedFactor[1] + "," + speedFactor[2]);
 	}
 	
-	public Static getWaypoint(){
-		return waypoint;
-	}
-
-	public void input(int val){
-		if(val == -2){
-			if(eleDest == ELEMENT.HUD_OPS_SPD)
-				initSpd();
-			if(eleDest == ELEMENT.HUD_OPS_HDG)
-				initHdg();
-			return;
+	public void input(ELEMENT type, int val){
+		switch(type){
+		case HUD_OPS_SPD:
+			if(val == -2) initSpd();
+			else adjustSpeed(val);
+			break;
+		case HUD_OPS_HDG:
+			if(val == -2) initHdg();
+			else adjustHdg(val);
+			break;
+		default:
+			break;
 		}
-		if(eleDest == ELEMENT.HUD_OPS_SPD){
-			adjustSpeed(val);
-		}
-		if(eleDest == ELEMENT.HUD_OPS_HDG){
-			adjustHdg(val);
-		}
-		updateInpStatus();
+		updateInpStatus(type);
 	}
 	
 	public void adjustSpeed(int val){
@@ -212,111 +204,13 @@ public class Xmit {
 			break;
 		}
 	}
-	
-@Deprecated	
-	public void process(int input){
-		if(input == -2){
-			if(inputDest)initSpd();
-			else initHdg();
-			updateInpStatus();
-			return;
-		}
-		if(inputDest){
-			switch(inputStatus){
-			case 100:
-				if(input > speedMax / 100){
-					this.speed = 0;
-					if(input > speedMax / 10){
-						this.speed += input;
-						inputStatus = 0;
-					}
-					else{
-						this.speed += input * 10;
-						inputStatus = 1;
-					}
-				}
-				else{
-					this.speed = input * 100;
-					inputStatus = 10;
-				}
-				break;
-			case 10:
-				this.speed += input * 10;
-				inputStatus = 1;
-				break;
-			case 1:
-				this.speed += input;
-				inputStatus = 0;
-				break;
-			}
-		}
-		else{
-			switch(inputStatus){
-			case 100:
-				if(input >= 0 && input <= 3){
-					this.heading = input * 100;
-					inputStatus = 10;
-				}
-				else if(input != -1){
-					this.heading = 0;
-					this.heading += input * 10;
-					inputStatus = 1;
-				}
-				else{
-					this.heading = headingInit;
-					inputStatus = -100;
-				}
-				break;
-			case 10:
-				if(input != -1){
-					this.heading += input * 10;
-					inputStatus = 1;	
-				}
-				else{
-					this.heading /= 100;
-					inputStatus = -100;
-				}
-				break;
-			case 1:
-				if(input != -1){
-					this.heading += input;
-					inputStatus = -100;
-				}
-				else{
-					this.heading /= 10;
-					inputStatus = -100;
-				}
-				break;
-			case -100:
-				if(input >= 0 && input <= 1){
-					this.mark = input * 100;
-					inputStatus = -10;
-				}
-				else{
-					this.mark = 0;
-					this.mark += input * 10;
-					inputStatus = -1;
-				}
-				break;
-			case -10:
-				this.mark += input * 10;
-				inputStatus = -1;
-				break;
-			case -1:
-				this.mark += input;
-				inputStatus = 0;
-			}
-		}
-		updateInpStatus();
-		if(inputDest)System.out.println("Speed: " + this.speed);
-		else System.out.println("Heading: " + this.heading + "." + this.mark);
-	}
 
 	public void nextWaypt(){
 		if(waypointsIndex == waypointsAvailable.size() - 1)
 			waypointsIndex = 0;
 		else
 			waypointsIndex++;
+		ELEMENT.HUD_LST_WPT.getResponse().setText(waypointsAvailable.get(waypointsIndex).getName());
 	}
 	
 	public void prevWaypt(){
@@ -324,38 +218,29 @@ public class Xmit {
 			waypointsIndex = waypointsAvailable.size() - 1;
 		else
 			waypointsIndex--;
-	}
-
-@Deprecated
-	/**
-	 * Sets the destination for input.<br>
-	 * false = heading<br>
-	 * true = speed<br>
-	 * @param category destination for input
-	 */
-	public void setInputDest(boolean dest){
-		inputDest = dest;
-		if(inputDest)
-			initSpd();
-		else
-			initHdg();
+		ELEMENT.HUD_LST_WPT.getResponse().setText(waypointsAvailable.get(waypointsIndex).getName());
 	}
 	
-	public void setInputDest(ELEMENT dest){
-		eleDest = dest;
-		if(eleDest == ELEMENT.HUD_OPS_HDG) initHdg();
-		if(eleDest == ELEMENT.HUD_OPS_SPD) initSpd();
-		System.out.println("Element Destination: " + eleDest);
+	public void clrWaypt(){
+		waypoint = null;
 	}
-
-@Deprecated
-	public void setWaypoint(Static waypoint){
-		this.waypoint = waypoint;
-	}
-
+	
 	public void setWaypoint(){
 		this.waypoint = waypointsAvailable.get(waypointsIndex);
 		opsAct[ELEMENT.HUD_OPS_DCT.getIndex()] = true;
+	}
+	
+	public void transmit(){
+		if(mobile == null) return;
+		byte actions = 0;
+		if(heading != headingInit) actions += 1;
+		if(mark != markInit) actions += 3;
+		if(speed != speedInit) actions += 5;
+		if(waypoint != waypointInit) actions += 11;
+		mobile.call(actions, heading, mark, speed, waypoint, opsAct);
+	}
+	
+	private void initApp(){
 	}
 	
 	private void initHdg(){
@@ -365,7 +250,6 @@ public class Xmit {
 		for(int i = 0; i < inputAvail.length; i++){
 			inputAvail[i] = false;
 		}
-		updateInpStatus();
 	}
 	
 	private void initSpd(){
@@ -375,7 +259,6 @@ public class Xmit {
 			inputAvail[i] = false;
 		}
 		factorSpeed();
-		updateInpStatus();
 	}
 		
 	public void setOpsActive(int index, boolean status){
@@ -388,8 +271,8 @@ public class Xmit {
 		}
 	}
 
-	private void updateInpStatus(){
-		if(eleDest == ELEMENT.HUD_OPS_HDG){
+	private void updateInpStatus(ELEMENT type){
+		if(type == ELEMENT.HUD_OPS_HDG){
 			switch(inputStatus){
 			case 100:
 				inputAvail[1] = true;
@@ -449,7 +332,7 @@ public class Xmit {
 				break;
 			}
 		}
-		if(eleDest == ELEMENT.HUD_OPS_SPD){
+		if(type == ELEMENT.HUD_OPS_SPD){
 			inputAvail[11] = true;
 			inputAvail[12] = true;
 			switch(inputStatus){

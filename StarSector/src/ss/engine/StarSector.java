@@ -1,4 +1,4 @@
-package ss;
+package ss.engine;
 import java.awt.Canvas;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -8,7 +8,6 @@ import java.io.IOException;
 
 import javax.swing.JFrame;
 
-import ss.lib.Hud;
 import ss.lib.SpriteSheet;
 import ss.util.BufferedImageLoader;
 
@@ -33,6 +32,9 @@ public class StarSector extends Canvas implements Runnable{
 	public static final int SweepSize = 10;
 	public static final int SweepLength = 60 / SweepSize;
 	
+	/**
+	 * Pixels per kilometer
+	 */
 	public static final double PPKM = WIDTH / SECTORSIZE_X;
 	
 	public static SpriteSheet Sprites;
@@ -41,10 +43,11 @@ public class StarSector extends Canvas implements Runnable{
 	
 	private static final int VER_MAJOR = 0;
 	private static final int VER_MINOR = 1;
-	private static final int VER_REV = 2;
+	private static final int VER_REV = 7;
 	private static final String VER_REL = "p";
 	
-	private Hud hud;
+//	private Hud hud;
+	public static Hud hud;
 	private BufferedImage bufimg = new BufferedImage(WIDTH,HEIGHT,BufferedImage.TYPE_INT_RGB);
 	private Thread thread;
 	

@@ -42,6 +42,13 @@
 				<Y>400</Y>
 				<Z>400</Z>
 			</Static>
+			<Static>
+				<Type>FIX</Type>
+				<Name>ARCEN</Name>
+				<X>256</X>
+				<Y>192</Y>
+				<Z>390</Z>
+			</Static>
 		</Contents>
 	</Sector>
 </SS>

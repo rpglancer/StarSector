@@ -1,4 +1,4 @@
-package ss.lib;
+package ss.entity;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -6,7 +6,15 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.util.Vector;
 
-import ss.StarSector;
+import ss.engine.Hud;
+import ss.engine.StarSector;
+import ss.engine.Tracon;
+import ss.lib.Calc;
+import ss.lib.Coords;
+import ss.lib.Draw;
+import ss.lib.Fonts;
+import ss.lib.Text;
+import ss.lib.Text.CHAT;
 import ss.type.ELEMENT;
 import ss.type.FSTATUS;
 import ss.type.MTYPE;
@@ -76,7 +84,7 @@ public class Mobile extends Entity{
 	
 	public Mobile(MTYPE type, Static origin, Static destination){
 		status = FSTATUS.HNDOFF;
-		canSelect = status.canSelect();
+		available = status.canSelect();
 		this.type = type;
 		this.serial = Text.genSerial(this);
 		this.name = type.getType();
@@ -88,17 +96,18 @@ public class Mobile extends Entity{
 		hdgDesired = hdgCurrent;
 		mkDesired = mkCurrent;
 		accelMax = 5;
-		speedCurrent = 150;
-		speedDesired = speedCurrent;
 		speedMax = 150;
+		speedCurrent = speedMax * 2;
+		speedDesired = speedMax;
 		this.dir = Calc.dVector(this, Hud.getTimeProject());
 		blinkTimeLast = System.currentTimeMillis();
 		Tracon.addMobile(this);
+		Tracon.pushChatter(Text.chatResponse(CHAT.DEPART, serial, "Tracon", origin.getName(), destination.getName()));
 	}
 	
 	@Override
 	public void deselect(){
-		this.isSelected = false;
+		this.selected = false;
 	}
 	
 	@Override
@@ -108,23 +117,36 @@ public class Mobile extends Entity{
 
 	@Override
 	public void render(Graphics g, boolean p){
-		if(isSelected)Draw.history(g, history);
+		if(selected)Draw.history(g, history);
 		if(p) Draw.sprite_centered(g, StarSector.Sprites.grabImage(type.getSpriteC(), type.getSpriteR(), 16, 16), this.loc.GetX(), this.loc.GetY());
 		else Draw.sprite_centered(g, StarSector.Sprites.grabImage(type.getSpriteC(), type.getSpriteR(), 16, 16), this.loc.GetX(), this.loc.GetZ());
-		if(isSelected)Draw.square_centered(g, this.loc, (int)(2 * StarSector.PPKM), Color.cyan, Hud.getP());
+		if(selected)Draw.square_centered(g, this.loc, (int)(2 * StarSector.PPKM), Color.cyan, Hud.getP());
 		Draw.line(g, loc, dir, Color.green, p);
 		renderFlightInfo(g, p);
 	}
 	
+	@Deprecated
 	@Override
 	public void select(){
-		if(canSelect) isSelected = true;
+		if(available) selected = true;
 	}
 	
-//	@Override
-//	public void setLoc(double x, double y, double z){
-//		this.loc.SetCoords(x, y, z);
-//	}
+	@Override
+	public Mobile querySelect(int x, int y){
+		int py;
+		if(Hud.getP()) py = (int)loc.GetY();
+		else py = (int)loc.GetZ();
+		if(x >= loc.GetX() - (StarSector.SPRITEWIDTH / 2) && x <= loc.GetX() + (StarSector.SPRITEWIDTH / 2)){
+			if(y >= py - (StarSector.SPRITEHEIGHT / 2) && y <= py + (StarSector.SPRITEHEIGHT / 2)){
+				if(available){
+					selected = true;
+					return this;
+				} 
+			}
+		}
+		selected = false;
+		return null;
+	}
 	
 	@Override
 	public void tick(){
@@ -133,36 +155,39 @@ public class Mobile extends Entity{
 		if(hdgCurrent != hdgDesired || mkCurrent != mkDesired){
 			turn();
 		}
-		if(mobOpsAct[ELEMENT.HUD_OPS_APR.getIndex()]){
-			if(Calc.doesIntersect(loc, dir, destination.getArriveCoords(), destination.getLoc())){
-				System.out.println("Calc.doesIntersect() returned true.");
-				Coords intcpt = Calc.intersection(loc, dir, destination.getLoc(), destination.getArriveCoords());
-				if(intcpt != null){
-					System.out.println("Mobile intercepts localizer at Coords: " + intcpt.GetX() + ", " + intcpt.GetY() + ", " + intcpt.GetZ());
-					int angle = (int)Calc.approachAngle(destination.getLoc(), intcpt, loc);
-					if(angle <= 225 && angle >= 135){
-						System.out.println("Established on localizer.");
-						setFlightStatus(FSTATUS.ONAPR);
-					}
-				}
-			}
-		}
 		if(mobOpsAct[ELEMENT.HUD_OPS_DCT.getIndex()] && waypoint != null){
 			this.hdgDesired = Calc.convertCoordsToHdg(loc, waypoint.loc);
 			this.mkDesired = Calc.convertCoordsToMk(loc, waypoint.loc);
+		}
+		if(mobOpsAct[ELEMENT.HUD_OPS_APR.getIndex()]){
 		}
 		loc.add(Calc.mVector(this));
 		dir = Calc.dVector(this, Hud.getTimeProject());
 	}
 	
-	public void call(Xmit xmit){
-		hdgDesired = xmit.getHeading();
-		mkDesired = xmit.getMark();
-		speedDesired = xmit.getSpd();
-		for(int i = 0; i < mobOpsAct.length; i++){
-			mobOpsAct[i] = xmit.getOpsActive(i);
+	public void call(byte actions, int hdg, int mk, int spd, Static wpt, boolean ops[]){
+		for(int i = 0; i < ops.length; i++){
+			mobOpsAct[i] = ops[i];
 		}
-		waypoint = xmit.getWaypoint();
+		if(actions >= 11){
+			waypoint = wpt;
+			actions -= 11;
+		}
+		if(actions >= 5){
+			speedDesired = spd;
+			actions -= 5;
+		}
+		if(actions >= 3){
+			mkDesired = mk;
+			actions -= 3;
+		}
+		if(actions >= 1){
+			hdgDesired = hdg;
+			actions -= 1;
+		}
+		if(actions > 0){
+			System.out.println("WARN: Malformed or invalid Mobile.call actions.");
+		}
 	}
 	
 	public void contact(){
@@ -171,10 +196,19 @@ public class Mobile extends Entity{
 			mobOps[i] = true;
 		}
 		mobOps[ELEMENT.HUD_OPS_CON.getIndex()] = false;
+		Tracon.pushChatter(Text.chatResponse(CHAT.CONTACT, serial, "Tracon", null, null));
 	}
 	
-	public Static getOrigin(){
-		return origin;
+	public boolean canSelect(){
+		return available;
+	}
+	
+	public boolean isSelected(){
+		return selected;
+	}
+	
+	public String getOrigin(){
+		return origin.getName();
 	}
 	
 	public Static getDestination(){
@@ -187,11 +221,6 @@ public class Mobile extends Entity{
 	
 	public double getMK(){
 		return (double)mkCurrent;
-	}
-	
-	@Deprecated
-	public String getName(){
-		return name;
 	}
 	
 	/**
@@ -249,14 +278,13 @@ public class Mobile extends Entity{
 	}
 	
 	public Static getWaypoint(){
-		if(waypoint == null) return null;
-		else return waypoint;
+		return waypoint;
 	}
 	
 	public void setFlightStatus(FSTATUS status){
 		this.status = status;
-		canSelect = status.canSelect();
-		if(this.isSelected) this.deselect();
+		available = status.canSelect();
+		if(selected) this.deselect();
 	}
 	
 	public void setOps(int i, boolean value){
@@ -277,6 +305,7 @@ public class Mobile extends Entity{
 			return a;
 	}
 	
+	// this should probably go elsewhere, Text perhaps?
 	private Color getBlinkColor(Color c1, Color c2, int rate){
 		if(System.currentTimeMillis() - blinkTimeLast < rate){
 			return c1;
@@ -386,6 +415,18 @@ public class Mobile extends Entity{
 		}
 		G.setColor(PrevC);
 		G.setFont(PrevF);
+	}
+	
+	public void renderStatus(Graphics G){
+		Draw.shape(G, ELEMENT.HUD_STA.getArea(), 1, Color.darkGray, Color.black);
+		G.setColor(Color.cyan);
+		Text.BoxText(G, Fonts.HudText, ELEMENT.HUD_STA_FROM.getArea(), Text.alignLeft(), Text.alignMiddle(), "FROM:");
+		Text.BoxText(G, Fonts.HudText, ELEMENT.HUD_STA_FROM.getArea(), Text.alignRight(), Text.alignMiddle(), origin.getName());
+		Text.BoxText(G, Fonts.HudText, ELEMENT.HUD_STA_TO.getArea(), Text.alignLeft(), Text.alignMiddle(), "TO:");
+		Text.BoxText(G, Fonts.HudText, ELEMENT.HUD_STA_TO.getArea(), Text.alignRight(), Text.alignMiddle(), destination.getName());
+		Text.BoxText(G, Fonts.HudText, ELEMENT.HUD_STA_WAY.getArea(), Text.alignLeft(), Text.alignMiddle(), "WAY:");
+		if(waypoint != null)
+			Text.BoxText(G, Fonts.HudText, ELEMENT.HUD_STA_WAY.getArea(), Text.alignRight(), Text.alignMiddle(), waypoint.getName());
 	}
 	
 	private void setFlightInfoColor(Graphics G){

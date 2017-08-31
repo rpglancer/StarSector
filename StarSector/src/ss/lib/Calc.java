@@ -2,7 +2,8 @@ package ss.lib;
 
 import java.awt.geom.Line2D;
 
-import ss.StarSector;
+import ss.engine.StarSector;
+import ss.entity.Mobile;
 
 public class Calc {
 	
@@ -223,9 +224,12 @@ public class Calc {
 		ex *= StarSector.PPKM;
 		ey *= StarSector.PPKM;
 		ez *= StarSector.PPKM;
-		ex += m.loc.GetX();
-		ey += m.loc.GetY();
-		ez += m.loc.GetZ();
+		ex += m.getLoc().GetX();
+		ey += m.getLoc().GetY();
+		ez += m.getLoc().GetZ();
+//		ex += m.loc.GetX();
+//		ey += m.loc.GetY();
+//		ez += m.loc.GetZ();
 		return new Coords(ex, ey, ez);
 	}
 	

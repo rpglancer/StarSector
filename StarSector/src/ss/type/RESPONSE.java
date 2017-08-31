@@ -43,7 +43,8 @@ public enum RESPONSE {
 	DESIRED ("Desired", Color.green, Color.green),
 	WAYPT	("", 		Color.green, Color.darkGray),
 	PREV	("PRV",		Color.green, Color.darkGray),
-	NEXT	("NXT",		Color.green, Color.darkGray)
+	NEXT	("NXT",		Color.green, Color.darkGray),
+	CHAT	("\0",		Color.green, Color.darkGray)		
 	;
 	
 	private String text;

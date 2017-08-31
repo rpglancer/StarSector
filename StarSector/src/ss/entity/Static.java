@@ -1,10 +1,15 @@
-package ss.lib;
+package ss.entity;
 
 import java.awt.Color;
 import java.awt.Graphics;
 import java.util.Vector;
 
-import ss.StarSector;
+import ss.engine.StarSector;
+import ss.engine.Tracon;
+import ss.lib.Coords;
+import ss.lib.Draw;
+import ss.lib.Fonts;
+import ss.lib.Text;
 import ss.type.MTYPE;
 import ss.type.STYPE;
 
@@ -28,7 +33,8 @@ public class Static extends Entity {
 		this.Name = "UntitledStation";
 		this.loc = new Coords(StarSector.WIDTH / 2, StarSector.HEIGHT / 2, 120);
 		this.Queue = new Vector<Mobile>();
-		this.canSelect = false;
+//		this.canSelect = false;
+		this.available = false;
 		Tracon.addStatic(this);
 	}
 	
@@ -48,7 +54,8 @@ public class Static extends Entity {
 		}
 		this.Name = name;
 		this.loc = new Coords(x,y,z);
-		this.canSelect = false;
+//		this.canSelect = false;
+		this.available = false;
 		this.Queue = new Vector<Mobile>();
 	}
 
@@ -66,11 +73,19 @@ public class Static extends Entity {
 	public void select() {
 		// TODO Auto-generated method stub
 	}
-
-//	@Override
-//	public void setLoc(double x, double y, double z) {
-//		// TODO Auto-generated method stub	
-//	}
+	
+	@Override
+	public Static querySelect(int x, int y){
+		return null;
+	}
+	
+	public boolean canSelect(){
+		return available;
+	}
+	
+	public boolean isSelected(){
+		return selected;
+	}
 	
 	@Override
 	public void render(Graphics g, boolean p){
@@ -92,10 +107,12 @@ public class Static extends Entity {
 		updateTime();
 	}
 	
+	@Deprecated
 	public Coords getArriveCoords(){
 		return this.Arrival;
 	}
 	
+	@Deprecated
 	public Coords getDepartCoords(){
 		return this.Departure;
 	}
@@ -117,10 +134,12 @@ public class Static extends Entity {
 		TOLR = System.currentTimeMillis();
 	}
 
+	@Deprecated
 	public void setArriveCoords(Coords arrive){
 		Arrival = arrive;
 	}
 	
+	@Deprecated
 	public void setDepartCoords(Coords depart){
 		Departure = depart;
 	}

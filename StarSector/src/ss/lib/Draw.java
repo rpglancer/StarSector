@@ -9,7 +9,8 @@ import java.awt.Shape;
 import java.awt.image.BufferedImage;
 import java.util.Vector;
 
-import ss.StarSector;
+import ss.engine.Hud;
+import ss.engine.StarSector;
 
 public class Draw {
 /**

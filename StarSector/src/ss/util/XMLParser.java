@@ -12,9 +12,9 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import ss.engine.Tracon;
+import ss.entity.Static;
 import ss.lib.Calc;
-import ss.lib.Static;
-import ss.lib.Tracon;
 
 public class XMLParser {
 	private Document dom;
@@ -94,7 +94,6 @@ public class XMLParser {
 			}
 		}
 		return s;
-//		return new Static(type, name, x, y, z);
 	}
 
 }

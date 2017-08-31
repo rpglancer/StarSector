@@ -3,12 +3,12 @@ package ss.lib;
 import java.awt.Color;
 import java.awt.Rectangle;
 
+import ss.engine.Hud;
 import ss.type.ELEMENT;
 import ss.type.HUDMODE;
 import ss.type.RESPONSE;
 
 public class HudElement {
-//	private static Hud elementHud;				//	The hud element manager [wtf is this for?]
 	private boolean isActive = false;			//	Is this element available for interaction?
 	private boolean isBlinking = false;			//	Is this element blinking?
 	private int blinkRate = 0;					//	For managing the blink rate
@@ -17,7 +17,6 @@ public class HudElement {
 
 @Deprecated
 	public HudElement(Hud hud, ELEMENT e){
-//		if(elementHud == null) elementHud = hud;	[unnecessary?]
 		elementArea = new Rectangle(e.getX(), e.getY(), e.getW(), e.getH());
 		element = e;
 	}

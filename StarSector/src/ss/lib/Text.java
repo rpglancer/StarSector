@@ -9,7 +9,10 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.util.Random;
 
-import ss.StarSector;
+import ss.engine.Hud;
+import ss.engine.StarSector;
+import ss.entity.Mobile;
+
 
 public class Text {
 	
@@ -70,6 +73,21 @@ public class Text {
 										"Outpost", "Lab", "Station",
 										"Forge", "Factory", "Complex"
 	};
+	
+	public static enum CHAT {DEPART, CONTACT, DIRECT, FOUR};
+	
+	public static final String chatResponse(CHAT CS, String source, String target, String origin, String dest){
+		switch(CS){
+		case DEPART:
+			return String.format("%s, %s with you departing %s for %s.", target, source, origin, dest);
+		case CONTACT:
+			return String.format("%s, %s roger radar contact.", source, target);
+		case DIRECT:
+			return String.format("%s cleared direct to %s.", source, dest);
+		default:
+			return "\0";
+		}
+	}
 
 	public static Rectangle genTextArea(Graphics g, Coords src, Font font, String text){
 		FontMetrics fm = g.getFontMetrics(font);

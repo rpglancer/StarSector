@@ -1,10 +1,12 @@
 package ss.type;
 
 import java.awt.Color;
+import java.awt.Rectangle;
 
-import ss.StarSector;
+import ss.engine.StarSector;
+
 //															Fill			Border
-//	EnumID			i	HUDMODE			RESPONSE			ColorAvail		ColorNotAvail	Coordinates
+//	EnumID			i	HUDMODE			RESPONSE			ColorAvail		ColorNotAvail	Coordinates[x,y,w,h]
 public enum ELEMENT {
 	HUD_MNU_NEW		(0, HUDMODE.MENU,	RESPONSE.NEWG,		Color.darkGray,	Color.darkGray, StarSector.WIDTH / 2 - 64, StarSector.HEIGHT / 2, 128, 32),
 	HUD_MNU_CNT		(1, HUDMODE.MENU,	RESPONSE.CONT,		Color.darkGray,	Color.darkGray, StarSector.WIDTH / 2 - 64, StarSector.HEIGHT / 2 + 48, 128, 32),
@@ -14,6 +16,7 @@ public enum ELEMENT {
 	HUD_OVW_CLOCK 	(2, HUDMODE.OVERVIEW, RESPONSE.CLOCK,	Color.darkGray, Color.darkGray,	0, 0, 80, 16),
 	HUD_OVW_ENTITY	(3, HUDMODE.OVERVIEW, RESPONSE.ENTITY,	Color.darkGray, Color.darkGray,	80, 0, 80, 16),
 	HUD_OVW_OPS		(4, HUDMODE.OVERVIEW, RESPONSE.OPS,		Color.darkGray,	Color.darkGray,	160, 0, 32, 16),
+	HUD_OVW_CHAT	(5, HUDMODE.OVERVIEW, RESPONSE.CHAT,	Color.darkGray, Color.darkGray, 192, 0, StarSector.WIDTH - 192 - 64, 16),
 	HUD_OPS 		(0, HUDMODE.OPS, 	RESPONSE.NULL,		Color.black, Color.darkGray,	160, 16, 128, 104),
 	HUD_OPS_HDG 	(1, HUDMODE.OPS, 	RESPONSE.HDG, 		Color.darkGray, Color.green,	HUD_OPS.getX() + 8, 24, 52, 16),
 	HUD_OPS_SPD 	(2, HUDMODE.OPS, 	RESPONSE.SPD,		Color.darkGray, Color.green,	HUD_OPS_HDG.getX() + 60, 24, 52, 16),
@@ -28,6 +31,7 @@ public enum ELEMENT {
 	HUD_STA_FROM	(2, HUDMODE.STA,	RESPONSE.NULL,		Color.darkGray, Color.darkGray,	HUD_STA_INFO.getX(), HUD_STA_INFO.getY(), 64, 16),
 	HUD_STA_AROW	(3, HUDMODE.STA,	RESPONSE.NULL,		Color.darkGray, Color.darkGray,	HUD_STA_FROM.getX() + 64, HUD_STA_FROM.getY(), 16, 16),
 	HUD_STA_TO		(4, HUDMODE.STA,	RESPONSE.NULL,		Color.darkGray, Color.darkGray, HUD_STA_AROW.getX() + 16, HUD_STA_AROW.getY(), 64, 16),
+	HUD_STA_WAY		(5, HUDMODE.STA,	RESPONSE.NULL,		Color.darkGray, Color.darkGray, HUD_STA_INFO.getX(), HUD_STA_INFO.getY() + 24, 64, 16),	
 	HUD_INP			(0, HUDMODE.INPUT, 	RESPONSE.NULL,		Color.black, Color.darkGray,	HUD_OPS.getX() + HUD_OPS.getW(), HUD_OPS.getY(), 128, 104),
 	HUD_INP_ONE		(1, HUDMODE.INPUT, 	RESPONSE.ONE,		Color.darkGray, Color.green,	HUD_INP.getX() + 8, HUD_INP.getY() + 8, 32, 16),
 	HUD_INP_TWO		(2, HUDMODE.INPUT, 	RESPONSE.TWO,		Color.darkGray, Color.green,	HUD_INP_ONE.getX() + 40, HUD_INP_ONE.getY(), 32, 16),
@@ -47,7 +51,6 @@ public enum ELEMENT {
 	HUD_LST_NXT		(3, HUDMODE.LIST,	RESPONSE.NEXT,		Color.darkGray, Color.green,	HUD_LST.getX() + HUD_LST.getW() - 40, HUD_LST_PRV.getY(),32,16),
 	HUD_LST_ACC		(4, HUDMODE.LIST,	RESPONSE.ACPT,		Color.darkGray, Color.green,	HUD_LST.getX() + 8, HUD_LST_PRV.getY() + 24,32,16),
 	HUD_LST_CAN		(5, HUDMODE.LIST,	RESPONSE.CNCL,		Color.darkGray, Color.green,	HUD_LST.getX() + HUD_LST.getW() - 40, HUD_LST_ACC.getY(),32,16),
-	
 	;
 	
 	private int i;
@@ -55,6 +58,7 @@ public enum ELEMENT {
 	private int y;
 	private int w;
 	private int h;
+	private Rectangle r;
 	Color primary;
 	Color secondary;
 	HUDMODE mode;
@@ -66,6 +70,7 @@ public enum ELEMENT {
 		this.y = y;
 		this.w = w;
 		this.h = h;
+		this.r = new Rectangle(x, y, w, h);
 		this.mode = mode;
 		this.response = response;
 		this.primary = primary;
@@ -78,6 +83,10 @@ public enum ELEMENT {
 	
 	public int getIndex(){
 		return i;
+	}
+	
+	public int getIndexByName(ELEMENT ele){
+		return ele.i;
 	}
 	
 	public int getX(){
@@ -94,6 +103,10 @@ public enum ELEMENT {
 	
 	public int getH(){
 		return h;
+	}
+	
+	public Rectangle getArea(){
+		return r;
 	}
 	
 	public Color getColorPrimary(){
