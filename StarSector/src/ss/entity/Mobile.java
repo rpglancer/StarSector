@@ -4,11 +4,13 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
+import java.util.Random;
 import java.util.Vector;
 
 import ss.engine.Hud;
 import ss.engine.StarSector;
 import ss.engine.Tracon;
+import ss.engine.Xmit;
 import ss.lib.Calc;
 import ss.lib.Coords;
 import ss.lib.Draw;
@@ -27,7 +29,6 @@ public class Mobile extends Entity{
 	private Coords dir;								// The directional vector of this Mobile.
 
 	private String name;
-//	private String owner;
 	private String serial;
 	
 	private Static destination		= null;			// The Static to which this Mobile is destined.
@@ -46,7 +47,7 @@ public class Mobile extends Entity{
 	private int hdgDesired			= 0;			// The desired heading of the Mobile as viewed from an x/y perspective [0-359]
 	private int mkCurrent			= 0;			// The current mark of the Mobile for traversal in an x/z perspective. [0-180]
 	private int mkDesired			= 0;			// The desired mark of the Mobile for traversal in an x/z perspective. [0-180]
-	
+
 	/**
 	 * Boolean values determining which operations are currently being actively applied to this mobile.<br>
 	 * They can be checked publicly by using {@link Mobile#getOpsActive(int)}.<br>
@@ -81,96 +82,34 @@ public class Mobile extends Entity{
 	private boolean[] mobOps = {false, false, false, false, false, false, false, true, true}; 
 	
 	private Vector<Coords> history = new Vector<Coords>();
-	
-	public Mobile(MTYPE type, Static origin, Static destination){
-//		status = FSTATUS.HNDOFF;
+		
+	public Mobile(MTYPE type, Static origin, Static destination, int[] info){
 		status = FSTATUS.ARIDEP;
 		available = status.canSelect();
 		this.type = type;
-		this.serial = Text.genSerial(this);
-		this.name = type.getType();
+		this.serial = genSerial();
+//		this.serial = Text.genSerial(this);
+		this.name = this.type.getType();
 		this.origin = origin;
 		this.destination = destination;
-		this.loc = new Coords(origin.getLoc().GetX(), origin.getLoc().GetY(), origin.getLoc().GetZ());
-		hdgCurrent = Calc.convertCoordsToHdg(loc, this.origin.getDepartCoords());
-		mkCurrent = Calc.convertCoordsToMk(loc, this.origin.getDepartCoords());
-		hdgDesired = hdgCurrent;
-		mkDesired = mkCurrent;
+		this.loc = new Coords(info[0], info[1], info[2]);
+		hdgDesired = hdgCurrent = info[3];
+		mkDesired = mkCurrent = info[4];
 		accelMax = 5;
 		speedMax = 150;
 		speedCurrent = speedMax * 2;
 		speedDesired = speedMax;
-		this.dir = Calc.dVector(this, Hud.getTimeProject());
+		dir = dVector(Hud.getTimeProject());
 		blinkTimeLast = System.currentTimeMillis();
 		Tracon.addMobile(this);
 		Tracon.pushChatter(Text.chatResponse(CHAT.DEPART, serial, "Tracon", origin.getName(), destination.getName()));
 	}
 	
-	@Override
-	public void deselect(){
-		this.selected = false;
+	public Xmit openComms(){
+		return new Xmit(this, hdgCurrent, mkCurrent, (int)speedCurrent, (int)speedMax, waypoint);
 	}
 	
-	@Override
-	public Coords getLoc(){
-		return this.loc;
-	}
-
-	@Override
-	public void render(Graphics g, boolean p){
-		if(selected)Draw.history(g, history);
-		if(p) Draw.sprite_centered(g, StarSector.Sprites.grabImage(type.getSpriteC(), type.getSpriteR(), 16, 16), this.loc.GetX(), this.loc.GetY());
-		else Draw.sprite_centered(g, StarSector.Sprites.grabImage(type.getSpriteC(), type.getSpriteR(), 16, 16), this.loc.GetX(), this.loc.GetZ());
-		if(selected)Draw.square_centered(g, this.loc, (int)(2 * StarSector.PPKM), Color.cyan, Hud.getP());
-		Draw.line(g, loc, dir, Color.green, p);
-		renderFlightInfo(g, p);
-	}
-	
-//	@Deprecated
-//	@Override
-//	public void select(){
-//		if(available) selected = true;
-//	}
-	
-	@Override
-	public Mobile querySelect(int x, int y){
-		int py;
-		if(Hud.getP()) py = (int)loc.GetY();
-		else py = (int)loc.GetZ();
-		if(x >= loc.GetX() - (StarSector.SPRITEWIDTH / 2) && x <= loc.GetX() + (StarSector.SPRITEWIDTH / 2)){
-			if(y >= py - (StarSector.SPRITEHEIGHT / 2) && y <= py + (StarSector.SPRITEHEIGHT / 2)){
-				if(available){
-					selected = true;
-					return this;
-				} 
-			}
-		}
-		selected = false;
-		return null;
-	}
-	
-	@Override
-	public void tick(){
-		updateHistory();
-		throttle();
-		if(status == FSTATUS.ARIDEP && speedCurrent == speedMax){
-			status = FSTATUS.HNDOFF;
-			available = FSTATUS.HNDOFF.canSelect();
-		}
-		if(hdgCurrent != hdgDesired || mkCurrent != mkDesired){
-			turn();
-		}
-		if(mobOpsAct[ELEMENT.HUD_OPS_DCT.getIndex()] && waypoint != null){
-			this.hdgDesired = Calc.convertCoordsToHdg(loc, waypoint.loc);
-			this.mkDesired = Calc.convertCoordsToMk(loc, waypoint.loc);
-		}
-		if(mobOpsAct[ELEMENT.HUD_OPS_APR.getIndex()]){
-		}
-		loc.add(Calc.mVector(this));
-		dir = Calc.dVector(this, Hud.getTimeProject());
-	}
-	
-	public void call(byte actions, int hdg, int mk, int spd, Static wpt, boolean ops[]){
+	public void xmit(byte actions, int hdg, int mk, int spd, Static wpt, boolean ops[]){
 		for(int i = 0; i < ops.length; i++){
 			mobOpsAct[i] = ops[i];
 		}
@@ -195,6 +134,10 @@ public class Mobile extends Entity{
 		}
 	}
 	
+	public boolean canSelect(){
+		return available;
+	}
+	
 	public void contact(){
 		setFlightStatus(FSTATUS.NORMAL);
 		for(int i = 1; i < mobOps.length; i++){
@@ -204,28 +147,23 @@ public class Mobile extends Entity{
 		Tracon.pushChatter(Text.chatResponse(CHAT.CONTACT, serial, "Tracon", null, null));
 	}
 	
-	public boolean canSelect(){
-		return available;
+	@Override
+	public void deselect(){
+		this.selected = false;
 	}
-	
-	public boolean isSelected(){
-		return selected;
-	}
-	
-	public String getOrigin(){
-		return origin.getName();
-	}
-	
+
 	public Static getDestination(){
 		return destination;
 	}
-	
-	public double getHdg(){
-		return (double)hdgCurrent;
+		
+	@Override
+	public Coords getLoc(){
+		return this.loc;
 	}
 	
-	public double getMK(){
-		return (double)mkCurrent;
+	@Deprecated
+	public MTYPE getMType(){
+		return this.type;
 	}
 	
 	/**
@@ -257,33 +195,47 @@ public class Mobile extends Entity{
 		}
 		return mobOpsAct[i];
 	}
-	
-	public String getSerial(){
-		return this.serial;
-	}
-	
-	/**
-	 * Obtains the current speed of this Mobile.
-	 * @return Current speed in m/s.
-	 */
-	public double getSpd(){
-		return this.speedCurrent;
-	}
-	
-	public MTYPE getMType(){
-		return this.type;
-	}
-	
-	/**
-	 * Obtains the maximum speed of this Mobile.
-	 * @return Maximum speed in m/s.
-	 */
-	public double getSpdMax(){
-		return speedMax;
-	}
-	
+		
 	public Static getWaypoint(){
 		return waypoint;
+	}
+	
+	public boolean isSelected(){
+		return selected;
+	}
+	
+	@Override
+	public Mobile querySelect(int x, int y){
+		int py;
+		if(Hud.getP()) py = (int)loc.GetY();
+		else py = (int)loc.GetZ();
+		if(x >= loc.GetX() - (StarSector.SPRITEWIDTH / 2) && x <= loc.GetX() + (StarSector.SPRITEWIDTH / 2)){
+			if(y >= py - (StarSector.SPRITEHEIGHT / 2) && y <= py + (StarSector.SPRITEHEIGHT / 2)){
+				if(available){
+					selected = true;
+					return this;
+				} 
+			}
+		}
+		selected = false;
+		return null;
+	}
+	
+	@Override
+	public void render(Graphics g, boolean p){
+		if(selected)Draw.history(g, history);
+		if(p) Draw.sprite_centered(g, StarSector.Sprites.grabImage(type.getSpriteC(), type.getSpriteR(), 16, 16), this.loc.GetX(), this.loc.GetY());
+		else Draw.sprite_centered(g, StarSector.Sprites.grabImage(type.getSpriteC(), type.getSpriteR(), 16, 16), this.loc.GetX(), this.loc.GetZ());
+		if(selected)Draw.square_centered(g, this.loc, (int)(2 * StarSector.PPKM), Color.cyan, Hud.getP());
+		Draw.line(g, loc, dir, Color.green, p);
+		renderFlightInfo(g, p);
+	}
+	
+	public void renderName(Graphics g){
+		Color c = g.getColor();
+		g.setColor(Color.cyan);
+		Text.BoxText(g, Fonts.RadarText, ELEMENT.HUD_OVW_ENTITY.getArea(), Text.alignCenter(), Text.alignMiddle(), serial);
+		g.setColor(c);
 	}
 	
 	public void setFlightStatus(FSTATUS status){
@@ -300,6 +252,25 @@ public class Mobile extends Entity{
 		else mobOps[i] = value;
 	}
 	
+	@Override
+	public void tick(){
+		updateHistory();
+		throttle();
+		turn();
+		if(status == FSTATUS.ARIDEP && speedCurrent == speedMax){
+			status = FSTATUS.HNDOFF;
+			available = FSTATUS.HNDOFF.canSelect();
+		}
+		if(mobOpsAct[ELEMENT.HUD_OPS_DCT.getIndex()] && waypoint != null){
+			this.hdgDesired = Calc.convertCoordsToHdg(loc, waypoint.loc);
+			this.mkDesired = Calc.convertCoordsToMk(loc, waypoint.loc);
+		}
+		if(status != FSTATUS.HNDOFF)
+			mobOps[ELEMENT.HUD_OPS_APR.getIndex()] = Tracon.queryApproach(loc);
+		loc.add(mVector());
+		dir = dVector(Hud.getTimeProject());
+	}
+		
 	private int calcDegOffset(int cur, int des){
 		int a = (Math.abs(cur - des));
 		if(a > 180){
@@ -308,6 +279,41 @@ public class Mobile extends Entity{
 		}
 		else
 			return a;
+	}
+	
+	/**
+	 * Create a directional vector for projecting a course visually.
+	 * @param mins	The number of minutes for which to calculate the vector.
+	 * @return		<b>Coords</b> The projected coordinates of a mobile.
+	 */
+	private Coords dVector(int mins){
+		double spd = Calc.KMPS(speedCurrent);
+		spd *= 10;
+		spd *= mins;
+		double vv[] = Calc.getP(hdgCurrent, mkCurrent);
+		double ex = spd * vv[0];
+		double ey = spd * vv[1];
+		double ez = spd * vv[2];
+		if(hdgCurrent > 180) ex = -ex;
+		if(hdgCurrent > 270 || hdgCurrent < 90) ey = -ey;
+		if(mkCurrent < 90) ez = -ez;
+		ex *= StarSector.PPKM;
+		ey *= StarSector.PPKM;
+		ez *= StarSector.PPKM;
+		ex += loc.GetX();
+		ey += loc.GetY();
+		ez += loc.GetZ();
+		return new Coords(ex, ey, ez);
+	}
+	
+	private String genSerial(){
+		Random r = new Random();
+		r.setSeed(System.nanoTime());
+		int serial = (r.nextInt(9) + 1) * 1000;
+		serial += r.nextInt(9) * 100;
+		serial += r.nextInt(9) * 10;
+		serial += r.nextInt(9);
+		return type + "-" + serial + Text.Races[r.nextInt(Text.Races.length)];
 	}
 	
 	// this should probably go elsewhere, Text perhaps?
@@ -322,69 +328,26 @@ public class Mobile extends Entity{
 		}
 	}
 	
-	private void throttle(){
-		if(speedCurrent == speedDesired) return;
-		else{
-			if(speedCurrent > speedDesired){
-				if(accelMax * StarSector.SweepLength > speedCurrent - speedDesired){
-					speedCurrent = speedDesired;
-				}
-				else{
-					speedCurrent -= accelMax * StarSector.SweepLength;
-				}
-			}
-			else{
-				if(accelMax * StarSector.SweepLength > speedDesired - speedCurrent){
-					speedCurrent = speedDesired;
-				}
-				else{
-					speedCurrent += accelMax * StarSector.SweepLength;
-				}
-			}
-		}
+	/**
+	 * Creates a movement vector for this mobile.
+	 * @return The coordinates of the resulting movement vector.
+	 */
+	private Coords mVector(){
+		double spd = Calc.KMPS(speedCurrent);
+		double vv[] = Calc.getP(hdgCurrent, mkCurrent);
+//		System.out.println("mVector: " + vv[0] + ", " + vv[1] + ", " + vv[2]);
+		double ex = spd * vv[0];
+		double ey = spd * vv[1];
+		double ez = spd * vv[2];
+		if(hdgCurrent > 180) ex = -ex;
+		if(hdgCurrent > 270 || hdgCurrent < 90) ey = -ey;
+		if(mkCurrent < 90) ez = -ez;
+		ex *= StarSector.PPKM;
+		ey *= StarSector.PPKM;
+		ez *= StarSector.PPKM;
+		return new Coords(ex, ey, ez);
 	}
 	
-	private void turn(){
-		int recipOne = 360 - Calc.reciprocal(hdgCurrent) + hdgDesired;
-		int recipTwo = 0 + Calc.reciprocal(hdgCurrent) - hdgDesired;
-		if(recipOne >= 360) recipOne -= 360;
-		if(recipOne < 0) recipOne += 360;
-		if(recipTwo >= 360) recipTwo -= 360;
-		if(recipTwo < 0) recipTwo += 360;
-		// Turn left
-		if(recipOne <= recipTwo){
-			if(calcDegOffset(hdgCurrent, hdgDesired) < turnRateMax * StarSector.SweepLength)
-				hdgCurrent -= calcDegOffset(hdgCurrent, hdgDesired);
-			else
-				hdgCurrent -= turnRateMax * StarSector.SweepLength;
-			if(hdgCurrent < 0) hdgCurrent += 360;
-		}
-		// Turn right
-		else{
-			if(calcDegOffset(hdgCurrent, hdgDesired) < turnRateMax * StarSector.SweepLength)
-				hdgCurrent += calcDegOffset(hdgCurrent, hdgDesired);
-			else
-				hdgCurrent += turnRateMax * StarSector.SweepLength;
-			if(hdgCurrent >= 360) hdgCurrent -= 360;
-		}
-		// Adjust Mk
-		if(mkCurrent != mkDesired){
-			if(mkCurrent > mkDesired){
-				if(calcDegOffset(mkCurrent, mkDesired) < turnRateMax * StarSector.SweepLength)
-					mkCurrent -= calcDegOffset(mkCurrent, mkDesired);
-				else
-					mkCurrent -= turnRateMax * StarSector.SweepLength;
-			}
-			else{
-				if(calcDegOffset(mkCurrent, mkDesired) < turnRateMax * StarSector.SweepLength)
-					mkCurrent += calcDegOffset(mkCurrent, mkDesired);
-				else
-					mkCurrent += turnRateMax * StarSector.SweepLength;
-			}
-		}
-		System.out.println("DEBUG: " + hdgCurrent + "." + mkCurrent);
-	}
-
 	private void renderFlightInfo(Graphics G, boolean p){
 		Color PrevC = G.getColor();
 		Font PrevF = G.getFont();
@@ -415,9 +378,9 @@ public class Mobile extends Entity{
 			if(waypoint != null)
 				G.drawString(waypoint.getName(), x, y);
 			else
-				G.drawString((int)this.getHdg()+"."+(int)this.getMK(), x, y);
+				G.drawString(hdgCurrent + "." + mkCurrent, x, y);
 			y+=fm.getAscent();
-			G.drawString((int)this.getSpd()+"", x, y);
+			G.drawString((int)speedCurrent + "", x, y);
 			break;
 		case ONAPR:
 			break;
@@ -466,6 +429,73 @@ public class Mobile extends Entity{
 		default:
 			break;	
 		}
+	}
+	
+	private void throttle(){
+		if(speedCurrent == speedDesired) return;
+		else{
+			if(speedCurrent > speedDesired){
+				if(accelMax * StarSector.SweepLength > speedCurrent - speedDesired){
+					speedCurrent = speedDesired;
+				}
+				else{
+					speedCurrent -= accelMax * StarSector.SweepLength;
+				}
+			}
+			else{
+				if(accelMax * StarSector.SweepLength > speedDesired - speedCurrent){
+					speedCurrent = speedDesired;
+				}
+				else{
+					speedCurrent += accelMax * StarSector.SweepLength;
+				}
+			}
+		}
+	}
+	
+	private void turn(){
+		// Adjust Heading
+		if(hdgCurrent != hdgDesired){
+			int recipOne = 360 - Calc.reciprocal(hdgCurrent) + hdgDesired;
+			int recipTwo = 0 + Calc.reciprocal(hdgCurrent) - hdgDesired;
+			if(recipOne >= 360) recipOne -= 360;
+			if(recipOne < 0) recipOne += 360;
+			if(recipTwo >= 360) recipTwo -= 360;
+			if(recipTwo < 0) recipTwo += 360;
+			// Turn left
+			if(recipOne <= recipTwo){
+				if(calcDegOffset(hdgCurrent, hdgDesired) < turnRateMax * StarSector.SweepLength)
+					hdgCurrent -= calcDegOffset(hdgCurrent, hdgDesired);
+				else
+					hdgCurrent -= turnRateMax * StarSector.SweepLength;
+				if(hdgCurrent < 0) hdgCurrent += 360;
+			}
+			// Turn right
+			else{
+				if(calcDegOffset(hdgCurrent, hdgDesired) < turnRateMax * StarSector.SweepLength)
+					hdgCurrent += calcDegOffset(hdgCurrent, hdgDesired);
+				else
+					hdgCurrent += turnRateMax * StarSector.SweepLength;
+				if(hdgCurrent >= 360) hdgCurrent -= 360;
+			}
+		}
+
+		// Adjust Mk
+		if(mkCurrent != mkDesired){
+			if(mkCurrent > mkDesired){
+				if(calcDegOffset(mkCurrent, mkDesired) < turnRateMax * StarSector.SweepLength)
+					mkCurrent -= calcDegOffset(mkCurrent, mkDesired);
+				else
+					mkCurrent -= turnRateMax * StarSector.SweepLength;
+			}
+			else{
+				if(calcDegOffset(mkCurrent, mkDesired) < turnRateMax * StarSector.SweepLength)
+					mkCurrent += calcDegOffset(mkCurrent, mkDesired);
+				else
+					mkCurrent += turnRateMax * StarSector.SweepLength;
+			}
+		}
+//		System.out.println("DEBUG: " + hdgCurrent + "." + mkCurrent);
 	}
 	
 	private void updateHistory(){

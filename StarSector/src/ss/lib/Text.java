@@ -11,7 +11,6 @@ import java.util.Random;
 
 import ss.engine.Hud;
 import ss.engine.StarSector;
-import ss.entity.Mobile;
 
 
 public class Text {
@@ -52,7 +51,7 @@ public class Text {
 		return ALIGNV.TOP;
 	}
 	
-	private static final String[] Races = {
+	public static final String[] Races = {
 										"Ar", "Au", "Be",
 										"Cu", "Ga", "Ir",
 										"Mo", "Pt", "Xe"
@@ -106,16 +105,6 @@ public class Text {
 		return StationSubject[rand.nextInt(StationSubject.length)] + " " + StationFocus[rand.nextInt(StationFocus.length)] + " " + StationTypes[rand.nextInt(StationTypes.length)];
 	}
 	
-	public static String genSerial(Mobile m){
-		Random r = new Random();
-		r.setSeed(System.nanoTime());
-		int serial = (r.nextInt(9) + 1) * 1000;
-		serial += r.nextInt(9) * 100;
-		serial += r.nextInt(9) * 10;
-		serial += r.nextInt(9);
-		return m.getMType().getType() + "-" + serial + Races[r.nextInt(Races.length)];
-	}
-
 	private static void alignText(Graphics g, Font f, int x, int y, int w, ALIGNH ah, String text){
 		FontMetrics fm = g.getFontMetrics(f);
 		int strlen = fm.stringWidth(text);
@@ -174,7 +163,7 @@ public class Text {
 		int c = lineCount(g, f, r.x + r.width - r.x, text);
 		FontMetrics m = g.getFontMetrics(f);
 		int y = r.y;
-		int w = r.width;
+//		int w = r.width;
 		if(v == ALIGNV.TOP) y += m.getAscent();
 		if(v == ALIGNV.MIDDLE){
 			if(c == 1) y += (r.height - textHeight(g,f,text)) / 2 + m.getAscent();

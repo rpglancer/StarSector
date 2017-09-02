@@ -9,6 +9,8 @@ import java.util.Vector;
 import ss.entity.Entity;
 import ss.entity.Mobile;
 import ss.entity.Static;
+import ss.lib.Calc;
+import ss.lib.Coords;
 import ss.type.MTYPE;
 import ss.type.STYPE;
 import ss.util.XMLParser;
@@ -67,7 +69,6 @@ public class Tracon {
 //		}while(dest == origin);
 //		return dest;
 //	}
-	
 	public static Static assignDestination(Static origin){
 		if(Statics.size() < 2){
 			System.out.println("WARN: Cannot assign destination due to isufficient pool");
@@ -130,17 +131,6 @@ public class Tracon {
 		}
 	}
 	
-//	@Deprecated
-//	public static Vector<Static> getWaypoints(){
-//		Vector<Static> w = new Vector<Static>();
-//		for(int i = 0; i < Statics.size(); i++){
-//			if(((Static)Statics.get(i)).getSTYPE() == STYPE.FIX){
-//				w.add((Static)Statics.get(i));
-//			}
-//		}
-//		return w;
-//	}
-	
 	public static boolean loadSave(){
 		initTracon();
 		return true;
@@ -187,6 +177,17 @@ public class Tracon {
 		Chatter chat = new Chatter(msg);
 		if(chatterQueue.size() < 1) chat.makeCurrent();
 		chatterQueue.addElement(chat);
+	}
+	
+	public static boolean queryApproach(Coords src){
+		for(int i = 0; i < Statics.size(); i++){
+			if(Calc.distanceKM(src, Statics.get(i).getLoc()) <= 20){
+				Static temp = (Static)Statics.get(i);
+				if(temp.getSTYPE() == STYPE.GATE || temp.getSTYPE() == STYPE.STATION)
+					return true;
+			}
+		}
+		return false;
 	}
 	
 	public static Chatter currentChatter(){

@@ -67,24 +67,16 @@ public class Xmit {
 									 false, false, false,
 									 false, false, false,
 									 false };
-	
-	/**
-	 * Create a new transmission order to be broadcast to a Mobile.
-	 * @param m The mobile for which the order applies.
-	 */
-	public Xmit(Mobile m){
-		mobile = m;
-		headingInit = (int)m.getHdg();
-		markInit = (int)m.getMK();
-		speedInit = (int)m.getSpd();
-		speedMax = (int)m.getSpdMax();
-		waypointInit = m.getWaypoint();
-		heading = headingInit;
-		mark = markInit;
-		speed = speedInit;
-		waypoint = waypointInit;
+		
+	public Xmit(Mobile mob, int hdg, int mk, int spd, int spdm, Static way){
+		mobile = mob;
+		headingInit = heading = hdg;
+		markInit = mark = mk;
+		speedInit = speed = spd;
+		speedMax = spdm;
+		waypointInit = way;
 		for(int i = 0; i < opsAct.length; i++){
-			opsAct[i] = m.getOpsActive(i);
+			opsAct[i] = mob.getOpsActive(i);
 		}
 		waypointsAvailable = Tracon.getStatics(STYPE.FIX);
 		if(waypointsAvailable.size() > 0)
@@ -149,7 +141,7 @@ public class Xmit {
 		updateInpStatus(type);
 	}
 	
-	public void adjustSpeed(int val){
+	private void adjustSpeed(int val){
 		switch(inputStatus){
 		case 100:
 			this.speed = val * 100;
@@ -166,7 +158,7 @@ public class Xmit {
 		}
 	}
 
-	public void adjustHdg(int val){
+	private void adjustHdg(int val){
 		switch(inputStatus){
 		case 100:
 			if(val == -1){
@@ -239,7 +231,7 @@ public class Xmit {
 		if(mark != markInit) actions += 3;
 		if(speed != speedInit) actions += 5;
 		if(waypoint != waypointInit) actions += 11;
-		mobile.call(actions, heading, mark, speed, waypoint, opsAct);
+		mobile.xmit(actions, heading, mark, speed, waypoint, opsAct);
 	}
 	
 	private void initApp(){

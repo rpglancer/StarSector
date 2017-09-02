@@ -6,6 +6,7 @@ import java.util.Vector;
 
 import ss.engine.StarSector;
 import ss.engine.Tracon;
+import ss.lib.Calc;
 import ss.lib.Coords;
 import ss.lib.Draw;
 import ss.lib.Fonts;
@@ -102,16 +103,6 @@ public class Static extends Entity {
 		updateTime();
 	}
 	
-	@Deprecated
-	public Coords getArriveCoords(){
-		return this.Arrival;
-	}
-	
-	@Deprecated
-	public Coords getDepartCoords(){
-		return this.Departure;
-	}
-	
 	public String getName(){
 		return Name;
 	}
@@ -125,8 +116,7 @@ public class Static extends Entity {
 	}
 	
 	public void releaseCraft(){
-//		new Mobile(MTYPE.M3, this, Tracon.getDestination(this));
-		new Mobile(MTYPE.M3, this, Tracon.assignDestination(this));
+		new Mobile(MTYPE.M3, this, Tracon.assignDestination(this), departureInfo());
 		TOLR = System.currentTimeMillis();
 	}
 
@@ -138,6 +128,17 @@ public class Static extends Entity {
 	@Deprecated
 	public void setDepartCoords(Coords depart){
 		Departure = depart;
+	}
+	
+	private int[] departureInfo(){
+		int[] departure = {
+			(int)loc.GetX(),
+			(int)loc.GetY(),
+			(int)loc.GetZ(),
+			Calc.convertCoordsToHdg(loc, Departure),
+			Calc.convertCoordsToMk(loc, Departure)
+		};
+		return departure;
 	}
 	
 	private void updateTime(){

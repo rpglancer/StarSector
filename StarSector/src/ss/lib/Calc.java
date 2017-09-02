@@ -3,7 +3,6 @@ package ss.lib;
 import java.awt.geom.Line2D;
 
 import ss.engine.StarSector;
-import ss.entity.Mobile;
 
 public class Calc {
 	
@@ -182,57 +181,7 @@ public class Calc {
 		}
 		return null;
 	}
-	
-	/**
-	 * Create a movement vector for a mobile.
-	 * @param m	The mobile having a movement vector created.
-	 * @return	The movement vector.
-	 */
-	public static Coords mVector(Mobile m){
-		double spd = KMPS(m.getSpd());
-		double vv[] = getP(m.getHdg(), m.getMK());
-//		System.out.println("mVector: " + vv[0] + ", " + vv[1] + ", " + vv[2]);
-		double ex = spd * vv[0];
-		double ey = spd * vv[1];
-		double ez = spd * vv[2];
-		if(m.getHdg() > 180) ex = -ex;
-		if(m.getHdg() > 270 || m.getHdg() < 90) ey = -ey;
-		if(m.getMK() < 90) ez = -ez;
-		ex *= StarSector.PPKM;
-		ey *= StarSector.PPKM;
-		ez *= StarSector.PPKM;
-		return new Coords(ex, ey, ez);
-	}
-	
-	/**
-	 * Create a directional vector for projecting a course visually.
-	 * @param m		The mobile having a directional vector created.
-	 * @param mins	The number of minutes for which to calculate the vector.
-	 * @return		<b>Coords</b> The projected coordinates of a mobile.
-	 */
-	public static Coords dVector(Mobile m, int mins){
-		double spd = KMPS(m.getSpd());
-		spd *= 10;
-		spd *= mins;
-		double vv[] = getP(m.getHdg(), m.getMK());
-		double ex = spd * vv[0];
-		double ey = spd * vv[1];
-		double ez = spd * vv[2];
-		if(m.getHdg() > 180) ex = -ex;
-		if(m.getHdg() > 270 || m.getHdg() < 90) ey = -ey;
-		if(m.getMK() < 90) ez = -ez;
-		ex *= StarSector.PPKM;
-		ey *= StarSector.PPKM;
-		ez *= StarSector.PPKM;
-		ex += m.getLoc().GetX();
-		ey += m.getLoc().GetY();
-		ez += m.getLoc().GetZ();
-//		ex += m.loc.GetX();
-//		ey += m.loc.GetY();
-//		ez += m.loc.GetZ();
-		return new Coords(ex, ey, ez);
-	}
-	
+		
 	/**
 	 * Calculate the Kilometers Moved Per Sweep of the radar.
 	 * @param spd	The speed of the object (in m/s).
@@ -249,7 +198,7 @@ public class Calc {
 	 * @param mk	The inclination of the object's heading [0-180]
 	 * @return	<b>double[]</b> Array containing the percentages of trust applied to each axis.
 	 */
-	private static double[] getP(double hdg, double mk){
+	public static double[] getP(double hdg, double mk){
 		double pct[] = {0,0,0};
 		double i = 0;
 		double zpct = Math.abs(convertMark(mk) / 90);
